@@ -1,0 +1,6 @@
+@RoadmapCreationAssistance.API_HostAddress = http://localhost:5135
+
+GET {{RoadmapCreationAssistance.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
