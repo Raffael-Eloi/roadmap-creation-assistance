@@ -56,9 +56,9 @@ internal class MilestonesAIGeneratorShould
             ]
         };
 
-        List<Milestone> milistonesResponse = [milestone1, milestone2];
+        List<Milestone> milestonesResponse = [milestone1, milestone2];
 
-        string jsonResponse = JsonSerializer.Serialize(milistonesResponse);
+        string jsonResponse = JsonSerializer.Serialize(milestonesResponse);
 
         openAIRepositoryMock
             .Setup(repo => repo.GetResponse(It.IsAny<string>()))
