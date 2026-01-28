@@ -33,6 +33,7 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
             Here's my classes:
             public class Milestone
             {
+                // Do not populate the Id
                 public int Id { get; set; }
 
                 public required string Title { get; set; }
