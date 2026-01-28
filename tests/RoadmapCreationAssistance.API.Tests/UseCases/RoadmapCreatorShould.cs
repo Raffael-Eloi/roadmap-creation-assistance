@@ -53,7 +53,7 @@ public class RoadmapCreatorShould
 
         var githubRepositoryMock = new Mock<IGithubRepository>();
 
-        IRoadmapCreator roadmapCreator = new RoadmapCreator();
+        IRoadmapCreator roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, githubRepositoryMock.Object);
 
         #endregion
 

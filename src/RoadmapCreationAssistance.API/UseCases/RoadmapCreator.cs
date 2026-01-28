@@ -1,11 +1,15 @@
-﻿using RoadmapCreationAssistance.API.Contracts.UseCases;
+﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
+using RoadmapCreationAssistance.API.Contracts.UseCases;
+using RoadmapCreationAssistance.API.Entities;
 
 namespace RoadmapCreationAssistance.API.UseCases;
 
-public class RoadmapCreator : IRoadmapCreator
+public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithubRepository githubRepository) : IRoadmapCreator
 {
-    public Task CreateAsync()
+    public async Task CreateAsync()
     {
-        throw new NotImplementedException();
+        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues();
+
+        await githubRepository.CreateMilestones(milestones);
     }
 }
