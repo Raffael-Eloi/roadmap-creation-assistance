@@ -16,9 +16,9 @@ internal class MilestonesAIGeneratorShould
     [SetUp]
     public void Setup()
     {
-        milestonesAIGenerator = new MilestonesAIGenerator();
-
         openAIRepositoryMock = new Mock<IOpenAIRepository>();
+
+        milestonesAIGenerator = new MilestonesAIGenerator(openAIRepositoryMock.Object);
     }
 
     [Test]
@@ -61,7 +61,7 @@ internal class MilestonesAIGeneratorShould
         string jsonResponse = JsonSerializer.Serialize(milistonesResponse);
 
         openAIRepositoryMock
-            .Setup(repo => repo.GetResponse(""))
+            .Setup(repo => repo.GetResponse(It.IsAny<string>()))
             .ReturnsAsync(jsonResponse);
 
         #endregion
@@ -75,9 +75,16 @@ internal class MilestonesAIGeneratorShould
         #region Assert
 
         milestones.Should().NotBeEmpty();
+        milestones.Should().BeEquivalentTo([milestone1, milestone2]);
 
-        milestones.Should().Contain(milestone1);
-        milestones.Should().Contain(milestone2);
+        // Verify the prompt was sent to the repository
+        openAIRepositoryMock.Verify(
+            repo => repo.GetResponse(It.Is<string>(prompt =>
+                prompt.Contains("📌 Prompt: Software Engineering Confidence Roadmap") &&
+                prompt.Contains("Given this prompt, I want you to generate milestones with issues")
+            )),
+            Times.Once()
+        );
 
         #endregion
     }
