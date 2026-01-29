@@ -13,7 +13,6 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
     {
         string baseUrl = GetBaseUrl();
 
-        httpClient.BaseAddress = new Uri(baseUrl);
         httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
         httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
 
@@ -26,11 +25,11 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             }; 
 
             HttpContent content = CreateHttpContent(githubMilestone);
-            HttpResponseMessage response = await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
+            HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
             string responseJson = await response.Content.ReadAsStringAsync();
             GithubMilestone? milestoneResponse = JsonSerializer.Deserialize<GithubMilestone>(responseJson, JsonSerializationOptions.Default);
             if (milestoneResponse is not null)
-                milestone.Id = milestoneResponse.Id!.Value;
+                milestone.Id = milestoneResponse.Number!.Value;
         }
     }
 
@@ -41,19 +40,36 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
         return content;
     }
 
+    private static HttpContent CreateHttpContent(Issue issue)
+    {
+        string json = JsonSerializer.Serialize(issue, JsonSerializationOptions.Default);
+        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+        return content;
+    }
+
     private string GetBaseUrl()
     {
         return configuration["GitHubApiBaseUrl"]!;
     }
 
-    public Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request)
+    public async Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {
-        throw new NotImplementedException();
+        string baseUrl = GetBaseUrl();
+
+        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
+        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+
+        foreach (Issue issue in issues)
+        {
+            HttpContent content = CreateHttpContent(issue);
+            HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/issues", content);
+            string responseJson = await response.Content.ReadAsStringAsync();
+        }
     }
 
     public class GithubMilestone
     {
-        public int? Id { get; set; }
+        public int? Number { get; set; }
 
         public required string Title { get; set; }
 

@@ -2,6 +2,7 @@
 using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Entities;
+using RoadmapCreationAssistance.API.Models;
 using RoadmapCreationAssistance.API.UseCases;
 
 namespace RoadmapCreationAssistance.API.Tests.UseCases;
@@ -11,6 +12,7 @@ public class RoadmapCreatorShould
     private Mock<IMilestonesAIGenerator> milestonesAiGeneratorMock;
     private Mock<IGithubRepository> githubRepositoryMock;
     private IRoadmapCreator roadmapCreator;
+    private RoadmapCreationRequest request;
 
     [SetUp]
     public void Setup()
@@ -18,6 +20,13 @@ public class RoadmapCreatorShould
         milestonesAiGeneratorMock = new Mock<IMilestonesAIGenerator>();
         githubRepositoryMock = new Mock<IGithubRepository>();
         roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, githubRepositoryMock.Object);
+
+        request = new RoadmapCreationRequest
+        {
+            GitHubOwner = "John",
+            GitHubRepositoryName = "My repo",
+            GitHubToken = "MYTOKEN"
+        };
     }
 
     [Test]
@@ -65,14 +74,14 @@ public class RoadmapCreatorShould
 
         #region Act
 
-        await roadmapCreator.CreateAsync();
+        await roadmapCreator.CreateAsync(request);
 
         #endregion
 
         #region Assert
 
         githubRepositoryMock
-            .Verify(githubRepo => githubRepo.CreateMilestones(milestones),
+            .Verify(githubRepo => githubRepo.CreateMilestones(milestones, request),
             Times.Once);
 
         #endregion
@@ -132,7 +141,7 @@ public class RoadmapCreatorShould
 
         #region Act
 
-        await roadmapCreator.CreateAsync();
+        await roadmapCreator.CreateAsync(request);
 
         #endregion
 
@@ -143,7 +152,7 @@ public class RoadmapCreatorShould
                 githubRepo.CreateIssues(It.Is<IEnumerable<Issue>>(issuesToBeCreated => 
                     issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.First().Title && issue.Milestone == milestone1Id) &&
                     issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.Last().Title && issue.Milestone == milestone1Id) &&
-                    issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id))),
+                    issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id)), request),
             Times.Once);
 
         #endregion
