@@ -1,10 +1,11 @@
 ﻿using RoadmapCreationAssistance.API.Entities;
+using RoadmapCreationAssistance.API.Models;
 
 namespace RoadmapCreationAssistance.API.Contracts.Repositories;
 
 public interface IGithubRepository
 {
-    Task CreateMilestones(IEnumerable<Milestone> milestones);
+    Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request);
 
-    Task CreateIssues(IEnumerable<Issue> issues);
+    Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request);
 }

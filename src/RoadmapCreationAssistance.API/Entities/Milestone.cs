@@ -8,7 +8,5 @@ public class Milestone
 
     public string Description { get; set; } = string.Empty;
 
-    public string State { get; set; } = string.Empty;
-
     public IEnumerable<Issue> Issues { get; set; } = [];
 }
