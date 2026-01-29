@@ -1,14 +1,21 @@
+using RoadmapCreationAssistance.API.Contracts.Repositories;
+using RoadmapCreationAssistance.API.Contracts.UseCases;
+using RoadmapCreationAssistance.API.Repositories;
+using RoadmapCreationAssistance.API.UseCases;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
+builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+
+builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
+builder.Services.AddScoped<IOpenAIRepository, OpenAIRepository>();
+builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
+builder.Services.AddScoped<IGithubRepository, GithubRepository>();
 
 var app = builder.Build();
 
