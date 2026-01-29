@@ -9,6 +9,11 @@ namespace RoadmapCreationAssistance.API.Repositories;
 
 public class GithubRepository(HttpClient httpClient, IConfiguration configuration) : IGithubRepository
 {
+    public Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request)
     {
         string baseUrl = GetBaseUrl();

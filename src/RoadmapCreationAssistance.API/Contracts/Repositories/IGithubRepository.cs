@@ -8,4 +8,6 @@ public interface IGithubRepository
     Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request);
 
     Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request);
+
+    Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request);
 }

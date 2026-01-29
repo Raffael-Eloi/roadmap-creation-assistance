@@ -30,6 +30,53 @@ public class RoadmapCreatorShould
     }
 
     [Test]
+    public async Task Create_Labels_On_Github()
+    {
+        #region Arrange
+
+        #endregion
+
+        #region Act
+
+        await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        Label expectedTechLabel = new()
+        {
+            Name = "TECH",
+            Description = "Technical implementation",
+            Color = "416BB8"
+        };
+
+        Label expectedMeLabel = new()
+        {
+            Name = "ME",
+            Description = "Mindset Evolution — Reflection and reasoning",
+            Color = "33D631"
+        };
+
+        Label expectedHandsOnLabel = new()
+        {
+            Name = "HO",
+            Description = "Larger practical challenges",
+            Color = "FFE638"
+        };
+
+        githubRepositoryMock
+            .Verify(githubRepo =>
+                githubRepo.CreateLabels(It.Is<IEnumerable<Label>>(labelsToBeCreated =>
+                    labelsToBeCreated.Any(label => label.Name == expectedTechLabel.Name && label.Description == expectedTechLabel.Description && label.Color == expectedTechLabel.Color) &&
+                    labelsToBeCreated.Any(label => label.Name == expectedMeLabel.Name && label.Description == expectedMeLabel.Description && label.Color == expectedMeLabel.Color) &&
+                    labelsToBeCreated.Any(label => label.Name == expectedHandsOnLabel.Name && label.Description == expectedHandsOnLabel.Description && label.Color == expectedHandsOnLabel.Color)), request),
+            Times.Once);
+
+        #endregion
+    }
+
+    [Test]
     public async Task Create_Milestones_On_Github()
     {
         #region Arrange
