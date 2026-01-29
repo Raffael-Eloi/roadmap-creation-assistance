@@ -9,9 +9,19 @@ namespace RoadmapCreationAssistance.API.Repositories;
 
 public class GithubRepository(HttpClient httpClient, IConfiguration configuration) : IGithubRepository
 {
-    public Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request)
+    public async Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request)
     {
-        throw new NotImplementedException();
+        string baseUrl = GetBaseUrl();
+
+        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
+        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+
+        foreach (Label label in labels)
+        {
+            HttpContent content = CreateHttpContent(label);
+            HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", content);
+            string responseJson = await response.Content.ReadAsStringAsync();
+        }
     }
 
     public async Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request)
@@ -36,6 +46,13 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             if (milestoneResponse is not null)
                 milestone.Id = milestoneResponse.Number!.Value;
         }
+    }
+
+    private static HttpContent CreateHttpContent(Label label)
+    {
+        string json = JsonSerializer.Serialize(label, JsonSerializationOptions.Default);
+        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+        return content;
     }
 
     private static HttpContent CreateHttpContent(GithubMilestone milestone)

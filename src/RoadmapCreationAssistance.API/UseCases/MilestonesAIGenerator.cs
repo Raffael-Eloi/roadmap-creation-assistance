@@ -48,6 +48,9 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
                 public required string Title { get; set; }
 
                 public string Body { get; set; } = string.Empty;
+
+                // It should be one of these values: "TECH", "ME", "HO"
+                public IEnumerable<string> Labels = [];
             }
         """;
 

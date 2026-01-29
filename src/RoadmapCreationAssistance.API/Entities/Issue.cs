@@ -7,4 +7,6 @@ public class Issue
     public string Body { get; set; } = string.Empty;
 
     public int Milestone { get; set; }
+
+    public IEnumerable<string> Labels = [];
 }
