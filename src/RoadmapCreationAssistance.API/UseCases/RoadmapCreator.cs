@@ -9,6 +9,10 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
 {
     public async Task CreateAsync(RoadmapCreationRequest request)
     {
+        IEnumerable<Label> labels = GenerateDefaultLabels();
+
+        await githubRepository.CreateLabels(labels, request);
+
         IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues();
 
         await githubRepository.CreateMilestones(milestones, request);
@@ -18,6 +22,31 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
         IEnumerable<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
 
         await githubRepository.CreateIssues(issues, request);
+    }
+
+    private static IEnumerable<Label> GenerateDefaultLabels()
+    {
+        return
+        [
+            new Label()
+            {
+                Name = "TECH",
+                Description = "Technical implementation",
+                Color = "416BB8"
+            },
+            new Label()
+            {
+                Name = "ME",
+                Description = "Mindset Evolution — Reflection and reasoning",
+                Color = "33D631"
+            },
+            new Label()
+            {
+                Name = "HO",
+                Description = "Larger practical challenges",
+                Color = "FFE638"
+            },
+        ];
     }
 
     private static void PopulateMilestoneIdOnIssues(IEnumerable<Milestone> milestones)
