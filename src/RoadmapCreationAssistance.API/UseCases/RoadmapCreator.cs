@@ -11,7 +11,16 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
         IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues();
 
         await githubRepository.CreateMilestones(milestones);
+        
+        PopulateMilestoneIdOnIssues(milestones);
 
+        IEnumerable<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
+
+        await githubRepository.CreateIssues(issues);
+    }
+
+    private static void PopulateMilestoneIdOnIssues(IEnumerable<Milestone> milestones)
+    {
         foreach (Milestone milestone in milestones)
         {
             foreach (Issue issue in milestone.Issues)
@@ -19,9 +28,5 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
                 issue.Milestone = milestone.Id;
             }
         }
-
-        IEnumerable<Issue> issues = milestones.SelectMany(milestone => milestone.Issues).ToList();
-
-        await githubRepository.CreateIssues(issues);
     }
 }
