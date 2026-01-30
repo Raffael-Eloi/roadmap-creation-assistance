@@ -230,4 +230,55 @@ public class RoadmapCreatorShould
 
         #endregion
     }
+
+    [Test]
+    public async Task Link_Issues_To_The_Project_On_Github()
+    {
+        #region Arrange
+
+        Milestone milestone = new()
+        {
+            Title = "My title 1",
+            Description = "My description 1",
+            Issues =
+            [
+                new Issue()
+                {
+                    Title = "My issue 1 from milestone 1"
+                },
+                new Issue()
+                {
+                    Title = "My issue 2 from milestone 1"
+                }
+            ]
+        };
+
+        milestonesAiGeneratorMock
+            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+            .ReturnsAsync([milestone]);
+
+        #endregion
+
+        #region Act
+
+        await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        string expectedTitle = "Roadmap - Software Engineer";
+
+        githubRepositoryMock
+            .Verify(githubRepo => 
+                githubRepo.LinkIssuesToProject(
+                    It.Is<Project>(project => project.Title == expectedTitle),
+                    It.Is<IEnumerable<Issue>>(issues => 
+                        issues.Any(issue => issue.Title == milestone.Issues.First().Title) && 
+                        issues.Any(issue => issue.Title == milestone.Issues.Last().Title)),
+                    request),
+            Times.Once);
+
+        #endregion
+    }
 }

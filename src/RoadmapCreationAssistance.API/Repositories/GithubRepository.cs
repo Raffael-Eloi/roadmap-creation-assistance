@@ -94,6 +94,11 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
         throw new NotImplementedException();
     }
 
+    public Task LinkIssuesToProject(Project project, IEnumerable<Issue> issues, RoadmapCreationRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
     public class GithubMilestone
     {
         public int? Number { get; set; }
