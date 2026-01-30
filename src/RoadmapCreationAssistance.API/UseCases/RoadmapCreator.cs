@@ -22,6 +22,13 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
         IEnumerable<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
 
         await githubRepository.CreateIssues(issues, request);
+
+        Project project = new()
+        {
+            Title = "Roadmap - Software Engineer"
+        };
+
+        await githubRepository.CreateProject(project, request);
     }
 
     private static IEnumerable<Label> GenerateDefaultLabels()
