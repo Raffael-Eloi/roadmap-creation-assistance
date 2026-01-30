@@ -1,5 +1,6 @@
 ﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Entities;
+using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.JsonSerialization;
 using RoadmapCreationAssistance.API.Models;
 using System.Text;
@@ -18,7 +19,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
 
         foreach (Label label in labels)
         {
-            HttpContent content = CreateHttpContent(label);
+            HttpContent content = label.ToJsonContent();
             HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", content);
             string responseJson = await response.Content.ReadAsStringAsync();
         }
@@ -39,41 +40,13 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
                 Description = milestone.Description
             };
 
-            HttpContent content = CreateHttpContent(githubMilestone);
+            HttpContent content = githubMilestone.ToJsonContent();
             HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
             string responseJson = await response.Content.ReadAsStringAsync();
             GithubMilestone? milestoneResponse = JsonSerializer.Deserialize<GithubMilestone>(responseJson, JsonSerializationOptions.Default);
             if (milestoneResponse is not null)
                 milestone.Id = milestoneResponse.Number!.Value;
         }
-    }
-
-    private static HttpContent CreateHttpContent(Label label)
-    {
-        string json = JsonSerializer.Serialize(label, JsonSerializationOptions.Default);
-        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-        return content;
-    }
-
-    private static HttpContent CreateHttpContent(GithubMilestone milestone)
-    {
-        string json = JsonSerializer.Serialize(milestone, JsonSerializationOptions.Default);
-        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-        return content;
-    }
-
-    private static HttpContent CreateHttpContent(Issue issue)
-    {
-        string json = JsonSerializer.Serialize(issue, JsonSerializationOptions.Default);
-        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-        return content;
-    }
-
-    private static HttpContent CreateHttpContent(IssueToProject issue)
-    {
-        string json = JsonSerializer.Serialize(issue, JsonSerializationOptions.Default);
-        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-        return content;
     }
 
     private string GetBaseUrl()
@@ -90,7 +63,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
 
         foreach (Issue issue in issues)
         {
-            HttpContent content = CreateHttpContent(issue);
+            HttpContent content = issue.ToJsonContent();
             HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/issues", content);
             string responseJson = await response.Content.ReadAsStringAsync();
             IssueResponse? issueCreated = JsonSerializer.Deserialize<IssueResponse>(responseJson, JsonSerializationOptions.Default);

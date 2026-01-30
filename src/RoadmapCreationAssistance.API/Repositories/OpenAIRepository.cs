@@ -1,6 +1,6 @@
 ﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
+using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.JsonSerialization;
-using System.Text;
 using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.Repositories;
@@ -9,12 +9,13 @@ public sealed class OpenAIRepository(HttpClient httpClient, IConfiguration confi
 {
     public async Task<string> GetResponse(string input, string openAiToken)
     {
-        httpClient.Timeout = TimeSpan.FromSeconds(180);
-        string baseUrl = configuration["OpenAIApiBaseUrl"]!;
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", openAiToken);
-        OpenAIInputRequest request = new OpenAIInputRequest(input);
-        string json = JsonSerializer.Serialize(request, JsonSerializationOptions.Default);
-        HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+        string baseUrl = GetBaseUrl();
+
+        AddOpenAiTokenToHttpClient(openAiToken);
+
+        OpenAIInputRequest request = new(input);
+
+        HttpContent content = request.ToJsonContent();
 
         HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/v1/responses", content);
         string responseJson = await response.Content.ReadAsStringAsync();
@@ -27,6 +28,17 @@ public sealed class OpenAIRepository(HttpClient httpClient, IConfiguration confi
             return string.Empty;
 
         return output.Content.FirstOrDefault()!.Text;
+    }
+
+    private void AddOpenAiTokenToHttpClient(string openAiToken)
+    {
+        httpClient.Timeout = TimeSpan.FromSeconds(180);
+        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", openAiToken);
+    }
+
+    private string GetBaseUrl()
+    {
+        return configuration["OpenAIApiBaseUrl"]!;
     }
 
     internal sealed class OpenAIInputRequest(string input)
