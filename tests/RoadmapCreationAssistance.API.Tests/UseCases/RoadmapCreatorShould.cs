@@ -62,7 +62,7 @@ public class RoadmapCreatorShould
         Label expectedHandsOnLabel = new()
         {
             Name = "HO",
-            Description = "Larger practical challenges",
+            Description = "Hands-On — Small practical challenges",
             Color = "FFE638"
         };
 

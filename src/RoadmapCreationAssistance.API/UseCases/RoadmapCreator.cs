@@ -52,7 +52,7 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
             new Label()
             {
                 Name = "HO",
-                Description = "Larger practical challenges",
+                Description = "Hands-On — Small practical challenges",
                 Color = "FFE638"
             },
         ];

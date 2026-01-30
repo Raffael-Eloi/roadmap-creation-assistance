@@ -26,35 +26,6 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
     {
         string currentDirectory = Directory.GetCurrentDirectory();
         string promptPath = Path.Combine(currentDirectory, "PromptBase", "roadmap_base.md");
-        string prompt = await File.ReadAllTextAsync(promptPath);
-
-        string extraInstructionToThePrompt = """
-            Given this prompt, I want you to generate milestones with issues based on the content.
-            IMPORTANT: The answer needs to be exactly an array of Milestones, because I will deserialize the answer to this model in my .NET application.
-            Here's my classes:
-            public class Milestone
-            {
-                // Do not populate the Id
-                public int Id { get; set; }
-
-                public required string Title { get; set; }
-
-                public string Description { get; set; } = string.Empty;
-
-                public IEnumerable<Issue> Issues { get; set; } = [];
-            }
-
-            public class Issue
-            {
-                public required string Title { get; set; }
-
-                public string Body { get; set; } = string.Empty;
-
-                // It should be ONLY ONE of these values: "TECH", "ME", "HO"
-                public IEnumerable<string> Labels = [];
-            }
-        """;
-
-        return prompt + extraInstructionToThePrompt;
+        return await File.ReadAllTextAsync(promptPath);
     }
 }
