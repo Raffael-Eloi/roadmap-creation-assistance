@@ -678,12 +678,13 @@ docker compose up
 
 ## Final commands
 
-Given this prompt, I want you to generate milestones with issues based on the content.
+Given this prompt, I want you to generate milestones with issues based on this roadmap.
 
 **IMPORTANT**: 
 - The answer needs to be exactly an array of Milestones, because I will deserialize the answer to this model in my .NET application.
-- The milestone description should be easy, clear and detailed using markdown
-- The issue description should be easy, clear and detailed using markdown
+- The milestone description property should use markdown and should be very detailed, simulating an Epic in the agile development
+- The issue body property should use markdown and should be very detailed, simulating a Story in the agile development
+- The instructions should be clear to a Junior Software Engineer or someone that does not have solid experience in the area
 
 
 Here's my classes:
