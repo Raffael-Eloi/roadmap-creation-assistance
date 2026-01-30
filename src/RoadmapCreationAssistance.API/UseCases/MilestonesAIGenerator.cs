@@ -1,6 +1,7 @@
 ﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Entities;
+using RoadmapCreationAssistance.API.JsonSerialization;
 using RoadmapCreationAssistance.API.Models;
 using System.Text.Json;
 
@@ -14,7 +15,7 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
 
         string response = await openAIRepository.GetResponse(prompt, request.OpenAIKey);
 
-        IEnumerable<Milestone>? milestones = JsonSerializer.Deserialize<IEnumerable<Milestone>>(response);
+        IEnumerable<Milestone>? milestones = JsonSerializer.Deserialize<IEnumerable<Milestone>>(response, JsonSerializationOptions.Default);
 
         if (milestones is null)
             return [];
