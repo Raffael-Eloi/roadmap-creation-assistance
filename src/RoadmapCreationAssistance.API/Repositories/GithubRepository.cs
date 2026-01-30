@@ -1,7 +1,6 @@
 ﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Entities;
 using RoadmapCreationAssistance.API.Extensions;
-using RoadmapCreationAssistance.API.JsonSerialization;
 using RoadmapCreationAssistance.API.Models;
 using System.Text;
 using System.Text.Json;
@@ -20,8 +19,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
         foreach (Label label in labels)
         {
             HttpContent content = label.ToJsonContent();
-            HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", content);
-            string responseJson = await response.Content.ReadAsStringAsync();
+            await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", content);
         }
     }
 
@@ -42,10 +40,8 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
 
             HttpContent content = githubMilestone.ToJsonContent();
             HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
-            string responseJson = await response.Content.ReadAsStringAsync();
-            GithubMilestone? milestoneResponse = JsonSerializer.Deserialize<GithubMilestone>(responseJson, JsonSerializationOptions.Default);
-            if (milestoneResponse is not null)
-                milestone.Id = milestoneResponse.Number!.Value;
+            GithubMilestone milestoneResponse = await response.DeserializeAsync<GithubMilestone>();
+            milestone.Id = milestoneResponse.Number!.Value;
         }
     }
 
@@ -65,10 +61,8 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
         {
             HttpContent content = issue.ToJsonContent();
             HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/issues", content);
-            string responseJson = await response.Content.ReadAsStringAsync();
-            IssueResponse? issueCreated = JsonSerializer.Deserialize<IssueResponse>(responseJson, JsonSerializationOptions.Default);
-            if (issueCreated != null)
-                issue.Number = issueCreated.Number;
+            IssueResponse issueCreated = await response.DeserializeAsync<IssueResponse>();
+            issue.Number = issueCreated.Number;
         }
     }
 

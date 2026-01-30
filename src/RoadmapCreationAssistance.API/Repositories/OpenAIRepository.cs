@@ -1,7 +1,5 @@
 ﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Extensions;
-using RoadmapCreationAssistance.API.JsonSerialization;
-using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.Repositories;
 
@@ -18,11 +16,9 @@ public sealed class OpenAIRepository(HttpClient httpClient, IConfiguration confi
         HttpContent content = request.ToJsonContent();
 
         HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/v1/responses", content);
-        string responseJson = await response.Content.ReadAsStringAsync();
-        OpenAIResponse? openAIResponse = JsonSerializer.Deserialize<OpenAIResponse>(responseJson, JsonSerializationOptions.Default);
-        if (openAIResponse is null)
-            return string.Empty;
-
+        
+        OpenAIResponse openAIResponse = await response.DeserializeAsync<OpenAIResponse>();
+        
         OpenAIOutput? output = openAIResponse.Output.FirstOrDefault(x => x.Type == "message");
         if (output is null)
             return string.Empty;
