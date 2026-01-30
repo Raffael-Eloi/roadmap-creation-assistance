@@ -1,17 +1,18 @@
 ﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Entities;
+using RoadmapCreationAssistance.API.Models;
 using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.UseCases;
 
 public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilestonesAIGenerator
 {
-    public async Task<IEnumerable<Milestone>> GenerateWithIssues()
+    public async Task<IEnumerable<Milestone>> GenerateWithIssues(RoadmapCreationRequest request)
     {
         string prompt = await GetRoadmapPrompt();
 
-        string response = await openAIRepository.GetResponse(prompt);
+        string response = await openAIRepository.GetResponse(prompt, request.OpenAIKey);
 
         IEnumerable<Milestone>? milestones = JsonSerializer.Deserialize<IEnumerable<Milestone>>(response);
 
@@ -49,7 +50,7 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
 
                 public string Body { get; set; } = string.Empty;
 
-                // It should be one of these values: "TECH", "ME", "HO"
+                // It should be ONLY ONE of these values: "TECH", "ME", "HO"
                 public IEnumerable<string> Labels = [];
             }
         """;

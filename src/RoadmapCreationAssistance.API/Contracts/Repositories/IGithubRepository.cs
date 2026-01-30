@@ -10,4 +10,6 @@ public interface IGithubRepository
     Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request);
 
     Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request);
+
+    Task CreateProject(Project project, RoadmapCreationRequest request);
 }

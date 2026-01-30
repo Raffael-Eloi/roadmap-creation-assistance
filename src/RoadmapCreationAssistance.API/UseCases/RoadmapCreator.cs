@@ -13,7 +13,7 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
 
         await githubRepository.CreateLabels(labels, request);
 
-        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues();
+        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues(request);
 
         await githubRepository.CreateMilestones(milestones, request);
         

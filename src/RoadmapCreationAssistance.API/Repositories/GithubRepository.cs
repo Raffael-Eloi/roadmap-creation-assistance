@@ -89,6 +89,11 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
         }
     }
 
+    public Task CreateProject(Project project, RoadmapCreationRequest request)
+    {
+        throw new NotImplementedException();
+    }
+
     public class GithubMilestone
     {
         public int? Number { get; set; }

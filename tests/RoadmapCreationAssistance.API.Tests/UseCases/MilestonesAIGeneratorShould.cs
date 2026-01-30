@@ -3,6 +3,7 @@ using Moq;
 using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Entities;
+using RoadmapCreationAssistance.API.Models;
 using RoadmapCreationAssistance.API.UseCases;
 using System.Text.Json;
 
@@ -11,6 +12,7 @@ namespace RoadmapCreationAssistance.API.Tests.UseCases;
 internal class MilestonesAIGeneratorShould
 {
     private IMilestonesAIGenerator milestonesAIGenerator;
+    private RoadmapCreationRequest request;
     private Mock<IOpenAIRepository> openAIRepositoryMock;
 
     [SetUp]
@@ -19,6 +21,14 @@ internal class MilestonesAIGeneratorShould
         openAIRepositoryMock = new Mock<IOpenAIRepository>();
 
         milestonesAIGenerator = new MilestonesAIGenerator(openAIRepositoryMock.Object);
+
+        request = new RoadmapCreationRequest
+        {
+            GitHubOwner = "John",
+            GitHubRepositoryName = "My repo",
+            GitHubToken = "MYTOKEN",
+            OpenAIKey = "MYOPENAIKEY"
+        };
     }
 
     [Test]
@@ -61,14 +71,14 @@ internal class MilestonesAIGeneratorShould
         string jsonResponse = JsonSerializer.Serialize(milestonesResponse);
 
         openAIRepositoryMock
-            .Setup(repo => repo.GetResponse(It.IsAny<string>()))
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
             .ReturnsAsync(jsonResponse);
 
         #endregion
 
         #region Act
 
-        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues();
+        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues(request);
 
         #endregion
 
@@ -82,7 +92,7 @@ internal class MilestonesAIGeneratorShould
             repo => repo.GetResponse(It.Is<string>(prompt =>
                 prompt.Contains("📌 Prompt: Software Engineering Confidence Roadmap") &&
                 prompt.Contains("Given this prompt, I want you to generate milestones with issues")
-            )),
+            ), request.OpenAIKey),
             Times.Once()
         );
 

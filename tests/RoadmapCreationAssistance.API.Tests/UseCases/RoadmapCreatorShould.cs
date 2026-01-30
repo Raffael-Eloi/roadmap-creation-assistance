@@ -25,7 +25,8 @@ public class RoadmapCreatorShould
         {
             GitHubOwner = "John",
             GitHubRepositoryName = "My repo",
-            GitHubToken = "MYTOKEN"
+            GitHubToken = "MYTOKEN",
+            OpenAIKey = "MYOPENAIKEY"
         };
     }
 
@@ -114,7 +115,7 @@ public class RoadmapCreatorShould
         List<Milestone> milestones = [milestone1, milestone2];
 
         milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues())
+            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
             .ReturnsAsync([milestone1, milestone2]);
 
         #endregion
@@ -176,7 +177,7 @@ public class RoadmapCreatorShould
         int milestone2Id = 2020;
 
         milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues())
+            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
             .Callback(() =>
             {
                 milestone1.Id = milestone1Id;
@@ -200,6 +201,31 @@ public class RoadmapCreatorShould
                     issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.First().Title && issue.Milestone == milestone1Id) &&
                     issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.Last().Title && issue.Milestone == milestone1Id) &&
                     issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id)), request),
+            Times.Once);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Create_A_Project_On_Github()
+    {
+        #region Arrange
+
+        #endregion
+
+        #region Act
+
+        await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        string expectedTitle = "Roadmap - Software Engineer";
+
+        githubRepositoryMock
+            .Verify(githubRepo => 
+                githubRepo.CreateProject(It.Is<Project>(project => project.Title == expectedTitle), request),
             Times.Once);
 
         #endregion

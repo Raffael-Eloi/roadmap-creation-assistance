@@ -7,4 +7,6 @@ public class RoadmapCreationRequest
     public required string GitHubRepositoryName { get; set; }
 
     public required string GitHubToken { get; set; }
+
+    public required string OpenAIKey { get; set; }
 }
