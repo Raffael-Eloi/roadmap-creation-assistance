@@ -10,5 +10,5 @@ public class Issue
 
     public int Milestone { get; set; }
 
-    public IEnumerable<string> Labels = [];
+    public List<string> Labels { get; set; } = [];
 }
