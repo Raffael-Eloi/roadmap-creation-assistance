@@ -29,6 +29,8 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
         };
 
         await githubRepository.CreateProject(project, request);
+
+        await githubRepository.LinkIssuesToProject(project, issues, request);
     }
 
     private static IEnumerable<Label> GenerateDefaultLabels()
