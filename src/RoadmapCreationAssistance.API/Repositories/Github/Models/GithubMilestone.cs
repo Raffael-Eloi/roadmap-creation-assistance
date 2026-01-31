@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Repositories.Github.Models;
 
-internal class GithubMilestone
+internal sealed class GithubMilestone
 {
     public int? Number { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Models;
 
-public class RoadmapCreationRequest
+public sealed class RoadmapCreationRequest
 {
     public required string GitHubOwner { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Repositories.Github.Models;
 
-internal class IssueToProject
+internal sealed class IssueToProject
 {
     public string Type => "Issue";
 
