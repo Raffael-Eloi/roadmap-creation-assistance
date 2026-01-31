@@ -18,7 +18,7 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
         IEnumerable<Milestone>? milestones = JsonSerializer.Deserialize<IEnumerable<Milestone>>(response, JsonSerializationOptions.Default);
 
         if (milestones is null)
-            return [];
+            throw new InvalidOperationException("Failed to deserialize milestones from AI response.");
 
         return milestones;
     }
