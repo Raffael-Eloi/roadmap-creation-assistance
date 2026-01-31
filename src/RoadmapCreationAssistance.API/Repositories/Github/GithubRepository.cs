@@ -2,10 +2,10 @@
 using RoadmapCreationAssistance.API.Entities;
 using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.Models;
-using System.Text;
+using RoadmapCreationAssistance.API.Repositories.Github.Models;
 using System.Text.Json;
 
-namespace RoadmapCreationAssistance.API.Repositories;
+namespace RoadmapCreationAssistance.API.Repositories.Github;
 
 public class GithubRepository(IConfiguration configuration) : IGithubRepository
 {
@@ -78,7 +78,7 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             }
             """;
 
-        HttpContent ownerContent = new StringContent(ownerQuery, Encoding.UTF8, "application/json");
+        HttpContent ownerContent = ownerQuery.ToJsonContent();
         HttpResponseMessage ownerResponse = await httpClient.PostAsync("/graphql", ownerContent);
         string ownerResponseJson = await ownerResponse.Content.ReadAsStringAsync();
 
@@ -99,7 +99,7 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             }
             """;
 
-        HttpContent projectContent = new StringContent(createProjectMutation, Encoding.UTF8, "application/json");
+        HttpContent projectContent = createProjectMutation.ToJsonContent();
         HttpResponseMessage projectResponse = await httpClient.PostAsync("/graphql", projectContent);
         string projectResponseJson = await projectResponse.Content.ReadAsStringAsync();
 
@@ -123,7 +123,7 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             }
             """;
 
-        HttpContent viewQueryContent = new StringContent(getViewAndFieldQuery, Encoding.UTF8, "application/json");
+        HttpContent viewQueryContent = getViewAndFieldQuery.ToJsonContent();
         HttpResponseMessage viewQueryResponse = await httpClient.PostAsync("/graphql", viewQueryContent);
         string viewQueryResponseJson = await viewQueryResponse.Content.ReadAsStringAsync();
 
@@ -154,43 +154,6 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             }
         }
 
-        // Add "In Review" option to Status field
-        if (!string.IsNullOrEmpty(statusFieldId))
-        {
-            string addOptionMutation = $$"""
-                {
-                    "query": "mutation { updateProjectV2Field(input: { projectId: \"{{projectId}}\", fieldId: \"{{statusFieldId}}\", singleSelectOptions: [ { name: \"Todo\", color: GRAY }, { name: \"In Progress\", color: YELLOW }, { name: \"In Review\", color: BLUE }, { name: \"Done\", color: GREEN } ] }) { projectV2Field { ... on ProjectV2SingleSelectField { id } } } }"
-                }
-                """;
-
-            HttpContent addOptionContent = new StringContent(addOptionMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync("/graphql", addOptionContent);
-        }
-
-        // Update view to Board layout and group by Status
-        if (!string.IsNullOrEmpty(viewId) && !string.IsNullOrEmpty(statusFieldId))
-        {
-            string updateViewMutation = $$"""
-                {
-                    "query": "mutation { updateProjectV2View(input: { projectId: \"{{projectId}}\", viewId: \"{{viewId}}\", layout: BOARD_LAYOUT, groupByFields: [\"{{statusFieldId}}\"] }) { projectV2View { id } } }"
-                }
-                """;
-
-            HttpContent updateViewContent = new StringContent(updateViewMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync("/graphql", updateViewContent);
-        }
-        else if (!string.IsNullOrEmpty(viewId))
-        {
-            string updateViewMutation = $$"""
-                {
-                    "query": "mutation { updateProjectV2View(input: { projectId: \"{{projectId}}\", viewId: \"{{viewId}}\", layout: BOARD_LAYOUT }) { projectV2View { id } } }"
-                }
-                """;
-
-            HttpContent updateViewContent = new StringContent(updateViewMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync("/graphql", updateViewContent);
-        }
-
         // Link the repository to the project
         string repoQuery = $$"""
             {
@@ -198,7 +161,7 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             }
             """;
 
-        HttpContent repoContent = new StringContent(repoQuery, Encoding.UTF8, "application/json");
+        HttpContent repoContent = repoQuery.ToJsonContent();
         HttpResponseMessage repoResponse = await httpClient.PostAsync("/graphql", repoContent);
         string repoResponseJson = await repoResponse.Content.ReadAsStringAsync();
 
@@ -218,7 +181,7 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             }
             """;
 
-        HttpContent linkContent = new StringContent(linkRepoMutation, Encoding.UTF8, "application/json");
+        HttpContent linkContent = linkRepoMutation.ToJsonContent();
         await httpClient.PostAsync("/graphql", linkContent);
     }
 
@@ -235,7 +198,7 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
                 }
                 """;
 
-            HttpContent issueContent = new StringContent(issueQuery, Encoding.UTF8, "application/json");
+            HttpContent issueContent = issueQuery.ToJsonContent();
             HttpResponseMessage issueResponse = await httpClient.PostAsync("/graphql", issueContent);
             string issueResponseJson = await issueResponse.Content.ReadAsStringAsync();
 
@@ -257,31 +220,8 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
                 }
                 """;
 
-            HttpContent addItemContent = new StringContent(addItemMutation, Encoding.UTF8, "application/json");
+            HttpContent addItemContent = addItemMutation.ToJsonContent();
             await httpClient.PostAsync("/graphql", addItemContent);
         }
-    }
-
-    internal class GithubMilestone
-    {
-        public int? Number { get; set; }
-
-        public required string Title { get; set; }
-
-        public string Description { get; set; } = string.Empty;
-    }
-
-    internal class IssueResponse
-    {
-        public int Number { get; set; }
-    }
-
-    internal class IssueToProject
-    {
-        public string Type => "Issue";
-
-        public required string Repo { get; set; }
-
-        public required int Number { get; set; }
     }
 }

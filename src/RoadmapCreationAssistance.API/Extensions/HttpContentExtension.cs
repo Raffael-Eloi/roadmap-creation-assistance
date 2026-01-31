@@ -11,4 +11,9 @@ public static class HttpContentExtensions
         string json = JsonSerializer.Serialize(obj, JsonSerializationOptions.Default);
         return new StringContent(json, Encoding.UTF8, "application/json");
     }
+
+    public static HttpContent ToJsonContent(this string input)
+    {
+        return new StringContent(input, Encoding.UTF8, "application/json");
+    }
 }
