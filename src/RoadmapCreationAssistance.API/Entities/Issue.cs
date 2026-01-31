@@ -2,13 +2,13 @@
 
 public class Issue
 {
-    public required string Title { get; set; }
+    public required string Title { get; init; }
 
     public int? Number { get; set; }
 
-    public string Body { get; set; } = string.Empty;
+    public string Body { get; init; } = string.Empty;
 
     public int Milestone { get; set; }
 
-    public List<string> Labels { get; set; } = [];
+    public List<string> Labels { get; init; } = [];
 }

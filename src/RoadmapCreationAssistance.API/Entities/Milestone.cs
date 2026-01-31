@@ -4,9 +4,9 @@ public class Milestone
 {
     public int Id { get; set; }
 
-    public required string Title { get; set; }
+    public required string Title { get; init; }
 
-    public string Description { get; set; } = string.Empty;
+    public string Description { get; init; } = string.Empty;
 
-    public IEnumerable<Issue> Issues { get; set; } = [];
+    public IEnumerable<Issue> Issues { get; init; } = [];
 }
