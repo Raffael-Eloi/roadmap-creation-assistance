@@ -7,28 +7,32 @@ using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.Repositories;
 
-public class GithubRepository(HttpClient httpClient, IConfiguration configuration) : IGithubRepository
+public class GithubRepository(IConfiguration configuration) : IGithubRepository
 {
     public async Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request)
     {
-        string baseUrl = GetBaseUrl();
-
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
-        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        HttpClient httpClient = CreateHttpClient(request);
 
         foreach (Label label in labels)
         {
-            HttpContent content = label.ToJsonContent();
-            await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", content);
+            HttpContent labelContent = label.ToJsonContent();
+            await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", labelContent);
         }
+    }
+
+    private HttpClient CreateHttpClient(RoadmapCreationRequest request)
+    {
+        HttpClient httpClient = new();
+        string baseUrl = GetBaseUrl();
+        httpClient.BaseAddress = new Uri(baseUrl);
+        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
+        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        return httpClient;
     }
 
     public async Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request)
     {
-        string baseUrl = GetBaseUrl();
-
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
-        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        HttpClient httpClient = CreateHttpClient(request);
 
         foreach (Milestone milestone in milestones)
         {
@@ -39,7 +43,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             };
 
             HttpContent content = githubMilestone.ToJsonContent();
-            HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
+            HttpResponseMessage response = await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
             GithubMilestone milestoneResponse = await response.DeserializeAsync<GithubMilestone>();
             milestone.Id = milestoneResponse.Number!.Value;
         }
@@ -52,15 +56,12 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
 
     public async Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {
-        string baseUrl = GetBaseUrl();
-
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
-        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        HttpClient httpClient = CreateHttpClient(request);
 
         foreach (Issue issue in issues)
         {
             HttpContent content = issue.ToJsonContent();
-            HttpResponseMessage response = await httpClient.PostAsync($"{baseUrl}/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/issues", content);
+            HttpResponseMessage response = await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/issues", content);
             IssueResponse issueCreated = await response.DeserializeAsync<IssueResponse>();
             issue.Number = issueCreated.Number;
         }
@@ -68,10 +69,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
 
     public async Task CreateProject(Project project, RoadmapCreationRequest request)
     {
-        string graphqlUrl = "https://api.github.com/graphql";
-
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
-        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        HttpClient httpClient = CreateHttpClient(request);
 
         // First, get the owner ID (user or organization)
         string ownerQuery = $$"""
@@ -81,7 +79,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             """;
 
         HttpContent ownerContent = new StringContent(ownerQuery, Encoding.UTF8, "application/json");
-        HttpResponseMessage ownerResponse = await httpClient.PostAsync(graphqlUrl, ownerContent);
+        HttpResponseMessage ownerResponse = await httpClient.PostAsync("/graphql", ownerContent);
         string ownerResponseJson = await ownerResponse.Content.ReadAsStringAsync();
 
         using JsonDocument ownerDoc = JsonDocument.Parse(ownerResponseJson);
@@ -102,7 +100,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             """;
 
         HttpContent projectContent = new StringContent(createProjectMutation, Encoding.UTF8, "application/json");
-        HttpResponseMessage projectResponse = await httpClient.PostAsync(graphqlUrl, projectContent);
+        HttpResponseMessage projectResponse = await httpClient.PostAsync("/graphql", projectContent);
         string projectResponseJson = await projectResponse.Content.ReadAsStringAsync();
 
         using JsonDocument projectDoc = JsonDocument.Parse(projectResponseJson);
@@ -126,7 +124,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             """;
 
         HttpContent viewQueryContent = new StringContent(getViewAndFieldQuery, Encoding.UTF8, "application/json");
-        HttpResponseMessage viewQueryResponse = await httpClient.PostAsync(graphqlUrl, viewQueryContent);
+        HttpResponseMessage viewQueryResponse = await httpClient.PostAsync("/graphql", viewQueryContent);
         string viewQueryResponseJson = await viewQueryResponse.Content.ReadAsStringAsync();
 
         using JsonDocument viewDoc = JsonDocument.Parse(viewQueryResponseJson);
@@ -166,7 +164,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
                 """;
 
             HttpContent addOptionContent = new StringContent(addOptionMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync(graphqlUrl, addOptionContent);
+            await httpClient.PostAsync("/graphql", addOptionContent);
         }
 
         // Update view to Board layout and group by Status
@@ -179,7 +177,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
                 """;
 
             HttpContent updateViewContent = new StringContent(updateViewMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync(graphqlUrl, updateViewContent);
+            await httpClient.PostAsync("/graphql", updateViewContent);
         }
         else if (!string.IsNullOrEmpty(viewId))
         {
@@ -190,7 +188,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
                 """;
 
             HttpContent updateViewContent = new StringContent(updateViewMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync(graphqlUrl, updateViewContent);
+            await httpClient.PostAsync("/graphql", updateViewContent);
         }
 
         // Link the repository to the project
@@ -201,7 +199,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             """;
 
         HttpContent repoContent = new StringContent(repoQuery, Encoding.UTF8, "application/json");
-        HttpResponseMessage repoResponse = await httpClient.PostAsync(graphqlUrl, repoContent);
+        HttpResponseMessage repoResponse = await httpClient.PostAsync("/graphql", repoContent);
         string repoResponseJson = await repoResponse.Content.ReadAsStringAsync();
 
         using JsonDocument repoDoc = JsonDocument.Parse(repoResponseJson);
@@ -221,15 +219,12 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
             """;
 
         HttpContent linkContent = new StringContent(linkRepoMutation, Encoding.UTF8, "application/json");
-        await httpClient.PostAsync(graphqlUrl, linkContent);
+        await httpClient.PostAsync("/graphql", linkContent);
     }
 
     public async Task LinkIssuesToProject(Project project, IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {
-        string graphqlUrl = "https://api.github.com/graphql";
-
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
-        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        HttpClient httpClient = CreateHttpClient(request);
 
         foreach (Issue issue in issues)
         {
@@ -241,7 +236,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
                 """;
 
             HttpContent issueContent = new StringContent(issueQuery, Encoding.UTF8, "application/json");
-            HttpResponseMessage issueResponse = await httpClient.PostAsync(graphqlUrl, issueContent);
+            HttpResponseMessage issueResponse = await httpClient.PostAsync("/graphql", issueContent);
             string issueResponseJson = await issueResponse.Content.ReadAsStringAsync();
 
             using JsonDocument issueDoc = JsonDocument.Parse(issueResponseJson);
@@ -263,7 +258,7 @@ public class GithubRepository(HttpClient httpClient, IConfiguration configuratio
                 """;
 
             HttpContent addItemContent = new StringContent(addItemMutation, Encoding.UTF8, "application/json");
-            await httpClient.PostAsync(graphqlUrl, addItemContent);
+            await httpClient.PostAsync("/graphql", addItemContent);
         }
     }
 
