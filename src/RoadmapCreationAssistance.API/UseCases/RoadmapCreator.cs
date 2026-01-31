@@ -9,53 +9,33 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
 {
     public async Task CreateAsync(RoadmapCreationRequest request)
     {
-        IEnumerable<Label> labels = GenerateDefaultLabels();
+        await CreateLabels(request);
 
-        await githubRepository.CreateLabels(labels, request);
+        IEnumerable<Milestone> milestones = await CreateMilestones(request);
 
-        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues(request);
-
-        await githubRepository.CreateMilestones(milestones, request);
+        IEnumerable<Issue> issues = await CreateIssues(request, milestones);
         
-        PopulateMilestoneIdOnIssues(milestones);
-
-        IEnumerable<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
-
-        await githubRepository.CreateIssues(issues, request);
-
-        Project project = new()
-        {
-            Title = "Roadmap - Software Engineer"
-        };
-
-        await githubRepository.CreateProject(project, request);
+        Project project = await CreateProject(request);
 
         await githubRepository.LinkIssuesToProject(project, issues, request);
     }
 
-    private static IEnumerable<Label> GenerateDefaultLabels()
+    private async Task CreateLabels(RoadmapCreationRequest request)
     {
-        return
-        [
-            new Label()
-            {
-                Name = "TECH",
-                Description = "Technical implementation",
-                Color = "416BB8"
-            },
-            new Label()
-            {
-                Name = "ME",
-                Description = "Mindset Evolution — Reflection and reasoning",
-                Color = "33D631"
-            },
-            new Label()
-            {
-                Name = "HO",
-                Description = "Hands-On — Small practical challenges",
-                Color = "FFE638"
-            },
-        ];
+        IEnumerable<Label> labels = Label.GenerateDefaultLabels();
+
+        await githubRepository.CreateLabels(labels, request);
+    }
+
+    private async Task<IEnumerable<Milestone>> CreateMilestones(RoadmapCreationRequest request)
+    {
+        IEnumerable<Milestone> milestones = await milestonesAIGenerator.GenerateWithIssues(request);
+
+        await githubRepository.CreateMilestones(milestones, request);
+
+        PopulateMilestoneIdOnIssues(milestones);
+
+        return milestones;
     }
 
     private static void PopulateMilestoneIdOnIssues(IEnumerable<Milestone> milestones)
@@ -67,5 +47,24 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
                 issue.Milestone = milestone.Id;
             }
         }
+    }
+
+    private async Task<IEnumerable<Issue>> CreateIssues(RoadmapCreationRequest request, IEnumerable<Milestone> milestones)
+    {
+        IEnumerable<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
+
+        await githubRepository.CreateIssues(issues, request);
+        return issues;
+    }
+
+    private async Task<Project> CreateProject(RoadmapCreationRequest request)
+    {
+        Project project = new()
+        {
+            Title = "Roadmap - Software Engineer"
+        };
+
+        await githubRepository.CreateProject(project, request);
+        return project;
     }
 }
