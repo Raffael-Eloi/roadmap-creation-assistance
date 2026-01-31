@@ -1,7 +1,7 @@
 using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
-using RoadmapCreationAssistance.API.Repositories;
 using RoadmapCreationAssistance.API.Repositories.Github;
+using RoadmapCreationAssistance.API.Repositories.OpenAI;
 using RoadmapCreationAssistance.API.UseCases;
 
 var builder = WebApplication.CreateBuilder(args);
