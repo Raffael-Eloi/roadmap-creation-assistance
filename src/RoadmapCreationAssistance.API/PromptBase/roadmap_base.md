@@ -98,6 +98,8 @@ Build the foundation for **collaboration, history tracking, and professional wor
 - Create a project on GitHub
 - Add the mentor as a collaborator
 - Commit and push code regularly
+- Block commits to `main` without PRs, the PRs must be reviewed and approved before merging
+- Use branches for features and fixes
 
 ### Concepts
 - What is Git and why we need it
