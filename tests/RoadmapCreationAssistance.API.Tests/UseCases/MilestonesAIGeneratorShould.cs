@@ -36,6 +36,8 @@ internal class MilestonesAIGeneratorShould
     {
         #region Arrange
 
+        string language = "English-US";
+
         Milestone milestone1 = new()
         {
             Title = "My title 1",
@@ -91,7 +93,8 @@ internal class MilestonesAIGeneratorShould
         openAIRepositoryMock.Verify(
             repo => repo.GetResponse(It.Is<string>(prompt =>
                 prompt.Contains("📌 Prompt: Software Engineering Confidence Roadmap") &&
-                prompt.Contains("Given this prompt, I want you to generate milestones with issues")
+                prompt.Contains("Given this prompt, I want you to generate milestones with issues") &&
+                prompt.Contains($"All documentation, milestones, issues and code must be written **in {language}**")
             ), request.OpenAIKey),
             Times.Once()
         );

@@ -30,7 +30,6 @@ The roadmap must prioritize **understanding “why” before “how”**, combin
 
 ## 📂 Organization Rules
 
-- All documentation and code must be written **in English**
 - Use **Notion** as the main learning journal
 
 ### 📁 Notion Structure

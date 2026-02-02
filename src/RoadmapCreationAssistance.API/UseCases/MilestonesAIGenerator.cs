@@ -11,7 +11,7 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
 {
     public async Task<IEnumerable<Milestone>> GenerateWithIssues(RoadmapCreationRequest request)
     {
-        string prompt = await GetRoadmapPrompt();
+        string prompt = await GetRoadmapPrompt(request);
 
         string response = await openAIRepository.GetResponse(prompt, request.OpenAIKey);
 
@@ -23,10 +23,12 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
         return milestones;
     }
 
-    private static async Task<string> GetRoadmapPrompt()
+    private static async Task<string> GetRoadmapPrompt(RoadmapCreationRequest request)
     {
         string currentDirectory = Directory.GetCurrentDirectory();
         string promptPath = Path.Combine(currentDirectory, "PromptBase", "roadmap_base.md");
-        return await File.ReadAllTextAsync(promptPath);
+        string prompt = await File.ReadAllTextAsync(promptPath);
+        prompt = prompt + $"All documentation, milestones, issues and code must be written **in {request.Language}**";
+        return prompt;
     }
 }
