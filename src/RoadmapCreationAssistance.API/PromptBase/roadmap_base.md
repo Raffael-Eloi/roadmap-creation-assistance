@@ -81,6 +81,10 @@ It reinforces the idea that:
 
 ---
 
+## Branch Naming Convention
+- Use the format: `milestone-{milestone_number}-{short_description}-username-feature_short_description`  
+    - Example: `milestone-1-start-up-johndoe-add-swagger`
+
 ## 🛣️ Roadmap Sequence (Must Follow This Order)
 
 ---
