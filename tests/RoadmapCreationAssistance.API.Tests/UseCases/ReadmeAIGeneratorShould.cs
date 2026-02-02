@@ -18,7 +18,7 @@ internal class ReadmeAIGeneratorShould
     {
         openAIRepositoryMock = new Mock<IOpenAIRepository>();
 
-        readmeAIGenerator = new ReadmeAIGenerator();
+        readmeAIGenerator = new ReadmeAIGenerator(openAIRepositoryMock.Object);
 
         request = new RoadmapCreationRequest
         {
