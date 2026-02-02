@@ -28,6 +28,11 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
         string currentDirectory = Directory.GetCurrentDirectory();
         string promptPath = Path.Combine(currentDirectory, "PromptBase", "roadmap_base.md");
         string prompt = await File.ReadAllTextAsync(promptPath);
+
+        string milestonesGenerationPromptPath = Path.Combine(currentDirectory, "PromptBase", "milestones_generation_instruction.md");
+        string milestonesGenerationPrompt = await File.ReadAllTextAsync(milestonesGenerationPromptPath);
+
+        prompt += Environment.NewLine + milestonesGenerationPrompt + Environment.NewLine;
         prompt += $"All documentation, milestones, issues and code must be written **in {request.Language}**";
         return prompt;
     }

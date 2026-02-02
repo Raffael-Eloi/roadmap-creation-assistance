@@ -225,8 +225,16 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
         }
     }
 
-    public Task CreateReadme(string readme, RoadmapCreationRequest request)
+    public async Task CreateReadme(string readme, RoadmapCreationRequest request)
     {
-        throw new NotImplementedException();
+        HttpClient httpClient = CreateHttpClient(request);
+
+        UpdateContent content = new()
+        {
+            Message = "Add README.md",
+            Content = readme.ToBase64()
+        };
+
+        await httpClient.PutAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/contents/README.md", content.ToJsonContent());
     }
 }

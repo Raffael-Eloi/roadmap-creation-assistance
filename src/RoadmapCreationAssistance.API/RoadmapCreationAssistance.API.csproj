@@ -15,6 +15,9 @@
     <None Update="PromptBase\roadmap_base.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="PromptBase\milestones_generation_instruction.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
