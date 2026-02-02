@@ -1,5 +1,6 @@
 using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
+using RoadmapCreationAssistance.API.Middlewares;
 using RoadmapCreationAssistance.API.Repositories.Github;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
 using RoadmapCreationAssistance.API.UseCases;
@@ -34,5 +35,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.Run();
