@@ -21,7 +21,7 @@ public class RoadmapCreatorShould
         milestonesAiGeneratorMock = new Mock<IMilestonesAIGenerator>();
         readmeAiGeneratorMock = new Mock<IReadmeAIGenerator>();
         githubRepositoryMock = new Mock<IGithubRepository>();
-        roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, githubRepositoryMock.Object);
+        roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, readmeAiGeneratorMock.Object, githubRepositoryMock.Object);
 
         request = new RoadmapCreationRequest
         {

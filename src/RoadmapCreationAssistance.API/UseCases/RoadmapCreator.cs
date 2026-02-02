@@ -5,7 +5,7 @@ using RoadmapCreationAssistance.API.Models;
 
 namespace RoadmapCreationAssistance.API.UseCases;
 
-public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithubRepository githubRepository) : IRoadmapCreator
+public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadmeAIGenerator readmeAIGenerator, IGithubRepository githubRepository) : IRoadmapCreator
 {
     public async Task CreateAsync(RoadmapCreationRequest request)
     {
@@ -14,10 +14,12 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
         IEnumerable<Milestone> milestones = await CreateMilestones(request);
 
         IEnumerable<Issue> issues = await CreateIssues(request, milestones);
-        
+
         Project project = await CreateProject(request);
 
         await githubRepository.LinkIssuesToProject(project, issues, request);
+        
+        await CreateReadme(request);
     }
 
     private async Task CreateLabels(RoadmapCreationRequest request)
@@ -67,5 +69,12 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
 
         await githubRepository.CreateProject(project, request);
         return project;
+    }
+
+    private async Task CreateReadme(RoadmapCreationRequest request)
+    {
+        string readme = await readmeAIGenerator.GenerateAsync(request);
+
+        await githubRepository.CreateReadme(readme, request);
     }
 }
