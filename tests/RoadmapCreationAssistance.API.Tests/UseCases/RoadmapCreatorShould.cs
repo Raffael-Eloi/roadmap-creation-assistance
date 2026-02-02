@@ -198,9 +198,9 @@ public class RoadmapCreatorShould
         githubRepositoryMock
             .Verify(githubRepo => 
                 githubRepo.CreateIssues(It.Is<IEnumerable<Issue>>(issuesToBeCreated => 
-                    issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.First().Title && issue.Milestone == milestone1Id) &&
-                    issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.Last().Title && issue.Milestone == milestone1Id) &&
-                    issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id)), request),
+                    issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.First().Title && issue.Milestone == milestone1Id && issue.Assignee == request.GitHubOwner) &&
+                    issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.Last().Title && issue.Milestone == milestone1Id && issue.Assignee == request.GitHubOwner) &&
+                    issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id && issue.Assignee == request.GitHubOwner)), request),
             Times.Once);
 
         #endregion

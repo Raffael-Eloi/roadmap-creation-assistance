@@ -33,18 +33,19 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IGithu
 
         await githubRepository.CreateMilestones(milestones, request);
 
-        PopulateMilestoneIdOnIssues(milestones);
+        PopulateMilestoneIdAndAssigneeOnIssues(milestones, request);
 
         return milestones;
     }
 
-    private static void PopulateMilestoneIdOnIssues(IEnumerable<Milestone> milestones)
+    private static void PopulateMilestoneIdAndAssigneeOnIssues(IEnumerable<Milestone> milestones, RoadmapCreationRequest request)
     {
         foreach (Milestone milestone in milestones)
         {
             foreach (Issue issue in milestone.Issues)
             {
                 issue.Milestone = milestone.Id;
+                issue.Assignee = request.GitHubOwner;
             }
         }
     }

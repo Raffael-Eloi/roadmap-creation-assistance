@@ -10,5 +10,7 @@ public class Issue
 
     public int Milestone { get; set; }
 
+    public string? Assignee { get; set; }
+
     public List<string> Labels { get; init; } = [];
 }
