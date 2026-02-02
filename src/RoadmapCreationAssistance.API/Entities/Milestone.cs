@@ -2,7 +2,7 @@
 
 public class Milestone
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     public required string Title { get; init; }
 
