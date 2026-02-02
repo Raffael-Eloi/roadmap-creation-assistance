@@ -10,6 +10,7 @@ namespace RoadmapCreationAssistance.API.Tests.UseCases;
 public class RoadmapCreatorShould
 {
     private Mock<IMilestonesAIGenerator> milestonesAiGeneratorMock;
+    private Mock<IReadmeAIGenerator> readmeAiGeneratorMock;
     private Mock<IGithubRepository> githubRepositoryMock;
     private IRoadmapCreator roadmapCreator;
     private RoadmapCreationRequest request;
@@ -18,6 +19,7 @@ public class RoadmapCreatorShould
     public void Setup()
     {
         milestonesAiGeneratorMock = new Mock<IMilestonesAIGenerator>();
+        readmeAiGeneratorMock = new Mock<IReadmeAIGenerator>();
         githubRepositoryMock = new Mock<IGithubRepository>();
         roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, githubRepositoryMock.Object);
 
@@ -277,6 +279,34 @@ public class RoadmapCreatorShould
                         issues.Any(issue => issue.Title == milestone.Issues.First().Title) && 
                         issues.Any(issue => issue.Title == milestone.Issues.Last().Title)),
                     request),
+            Times.Once);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Create_Readme_On_Github()
+    {
+        #region Arrange
+
+        string readme = "# Roadmap\n\nThis is a sample roadmap.";
+
+        readmeAiGeneratorMock
+            .Setup(readmeGenerator => readmeGenerator.GenerateAsync(request))
+            .ReturnsAsync(readme);
+
+        #endregion
+
+        #region Act
+
+        await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        githubRepositoryMock
+            .Verify(githubRepo => githubRepo.CreateReadme(readme, request),
             Times.Once);
 
         #endregion

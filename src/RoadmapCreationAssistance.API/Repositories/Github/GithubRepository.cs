@@ -224,4 +224,9 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
             await httpClient.PostAsync("/graphql", addItemContent);
         }
     }
+
+    public Task CreateReadme(string readme, RoadmapCreationRequest request)
+    {
+        throw new NotImplementedException();
+    }
 }

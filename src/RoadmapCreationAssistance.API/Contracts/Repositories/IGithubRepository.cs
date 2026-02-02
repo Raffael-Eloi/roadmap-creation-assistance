@@ -14,4 +14,6 @@ public interface IGithubRepository
     Task CreateProject(Project project, RoadmapCreationRequest request);
 
     Task LinkIssuesToProject(Project project, IEnumerable<Issue> issues, RoadmapCreationRequest request);
+
+    Task CreateReadme(string readme, RoadmapCreationRequest request);
 }
