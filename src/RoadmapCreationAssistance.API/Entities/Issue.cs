@@ -8,7 +8,7 @@ public class Issue
 
     public string Body { get; init; } = string.Empty;
 
-    public int Milestone { get; set; }
+    public int? Milestone { get; set; }
 
     public string? Assignee { get; set; }
 

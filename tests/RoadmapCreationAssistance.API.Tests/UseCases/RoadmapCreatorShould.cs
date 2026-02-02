@@ -327,6 +327,14 @@ public class RoadmapCreatorShould
             .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
             .ReturnsAsync([milestone]);
 
+        milestonesAiGeneratorMock
+            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+            .Callback(() =>
+            {
+                milestone.Id = 1010;
+            })
+            .ReturnsAsync([milestone]);
+
         #endregion
 
         #region Act

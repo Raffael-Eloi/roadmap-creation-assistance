@@ -54,7 +54,11 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
 
     private async Task<IEnumerable<Issue>> CreateIssues(RoadmapCreationRequest request, IEnumerable<Milestone> milestones)
     {
-        IEnumerable<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
+        List<Issue> issues = [.. milestones.Where(milestone => milestone.Id.HasValue).SelectMany(milestone => milestone.Issues)];
+        if (issues.Count == 0)
+        {
+            return issues;
+        }
 
         await githubRepository.CreateIssues(issues, request);
         return issues;
