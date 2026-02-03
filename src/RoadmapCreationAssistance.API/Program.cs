@@ -1,6 +1,7 @@
 using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Middlewares;
+using RoadmapCreationAssistance.API.Policies;
 using RoadmapCreationAssistance.API.Repositories.Github;
 using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
@@ -14,21 +15,28 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Create logger for HTTP policy logging
+using ILoggerFactory loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.AddConsole());
+ILogger httpPolicyLogger = loggerFactory.CreateLogger("HttpPolicies");
+
 builder.Services.AddHttpClient(OpenAIRepository.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["OpenAIApi:BaseUrl"]!);
     client.Timeout = TimeSpan.FromSeconds(180);
-});
+})
+.AddPolicyHandler(HttpPolicies.GetOpenAIRetryPolicy(httpPolicyLogger));
 
 builder.Services.AddHttpClient(GithubRepository.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
-});
+})
+.AddPolicyHandler(HttpPolicies.GetGitHubRetryPolicy(httpPolicyLogger));
 
 builder.Services.AddHttpClient(GitHubGraphQLClient.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
-});
+})
+.AddPolicyHandler(HttpPolicies.GetGitHubRetryPolicy(httpPolicyLogger));
 
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
