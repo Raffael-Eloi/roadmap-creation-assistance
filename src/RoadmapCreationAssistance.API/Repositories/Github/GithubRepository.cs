@@ -45,9 +45,8 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
             HttpContent content = githubMilestone.ToJsonContent();
             HttpResponseMessage response = await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/milestones", content);
 
-            // If the milestone creation failed, skip setting the ID
             if (!response.IsSuccessStatusCode)
-                continue;
+                throw new InvalidOperationException($"Failed to create milestone '{milestone.Title}'. Status code: {response.StatusCode}");
 
             GithubMilestone milestoneResponse = await response.DeserializeAsync<GithubMilestone>();
             milestone.Id = milestoneResponse.Number!.Value;
