@@ -3,12 +3,15 @@ using RoadmapCreationAssistance.API.Entities;
 using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.Models;
 using RoadmapCreationAssistance.API.Repositories.Github.Models;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.Repositories.Github;
 
-public class GithubRepository(IConfiguration configuration) : IGithubRepository
+public class GithubRepository(IHttpClientFactory httpClientFactory) : IGithubRepository
 {
+    public const string HttpClientName = "GitHub";
+
     public async Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request)
     {
         HttpClient httpClient = CreateHttpClient(request);
@@ -22,10 +25,8 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
 
     private HttpClient CreateHttpClient(RoadmapCreationRequest request)
     {
-        HttpClient httpClient = new();
-        string baseUrl = GetBaseUrl();
-        httpClient.BaseAddress = new Uri(baseUrl);
-        httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", request.GitHubToken);
+        HttpClient httpClient = httpClientFactory.CreateClient(HttpClientName);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.GitHubToken);
         httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
         return httpClient;
     }
@@ -54,10 +55,6 @@ public class GithubRepository(IConfiguration configuration) : IGithubRepository
         }
     }
 
-    private string GetBaseUrl()
-    {
-        return configuration["GitHubApiBaseUrl"]!;
-    }
 
     public async Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {

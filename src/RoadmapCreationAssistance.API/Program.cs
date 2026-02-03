@@ -12,7 +12,17 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHttpClient();
+
+builder.Services.AddHttpClient(OpenAIRepository.HttpClientName, client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["OpenAIApiBaseUrl"]!);
+    client.Timeout = TimeSpan.FromSeconds(180);
+});
+
+builder.Services.AddHttpClient(GithubRepository.HttpClientName, client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["GitHubApiBaseUrl"]!);
+});
 
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
