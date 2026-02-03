@@ -7,11 +7,11 @@ using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.UseCases;
 
-public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilestonesAIGenerator
+public class MilestonesAIGenerator(IPromptProvider promptProvider, IOpenAIRepository openAIRepository) : IMilestonesAIGenerator
 {
     public async Task<IEnumerable<Milestone>> GenerateWithIssues(RoadmapCreationRequest request)
     {
-        string prompt = await GetRoadmapPrompt(request);
+        string prompt = await promptProvider.GetMilestoneInstructionAsync(request.Language);
 
         string response = await openAIRepository.GetResponse(prompt, request.OpenAIKey);
 
@@ -21,19 +21,5 @@ public class MilestonesAIGenerator(IOpenAIRepository openAIRepository) : IMilest
             throw new InvalidOperationException("Failed to deserialize milestones from AI response.");
 
         return milestones;
-    }
-
-    private static async Task<string> GetRoadmapPrompt(RoadmapCreationRequest request)
-    {
-        string currentDirectory = Directory.GetCurrentDirectory();
-        string promptPath = Path.Combine(currentDirectory, "PromptBase", "roadmap_base.md");
-        string prompt = await File.ReadAllTextAsync(promptPath);
-
-        string milestonesGenerationPromptPath = Path.Combine(currentDirectory, "PromptBase", "milestones_generation_instruction.md");
-        string milestonesGenerationPrompt = await File.ReadAllTextAsync(milestonesGenerationPromptPath);
-
-        prompt += Environment.NewLine + milestonesGenerationPrompt + Environment.NewLine;
-        prompt += $"All documentation, milestones, issues and code must be written **in {request.Language}**";
-        return prompt;
     }
 }

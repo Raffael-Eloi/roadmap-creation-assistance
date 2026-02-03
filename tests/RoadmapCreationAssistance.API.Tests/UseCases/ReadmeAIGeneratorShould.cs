@@ -11,14 +11,16 @@ internal class ReadmeAIGeneratorShould
 {
     private IReadmeAIGenerator readmeAIGenerator;
     private RoadmapCreationRequest request;
+    private Mock<IPromptProvider> promptProviderMock;
     private Mock<IOpenAIRepository> openAIRepositoryMock;
 
     [SetUp]
     public void Setup()
     {
+        promptProviderMock = new Mock<IPromptProvider>();
         openAIRepositoryMock = new Mock<IOpenAIRepository>();
 
-        readmeAIGenerator = new ReadmeAIGenerator(openAIRepositoryMock.Object);
+        readmeAIGenerator = new ReadmeAIGenerator(promptProviderMock.Object, openAIRepositoryMock.Object);
 
         request = new RoadmapCreationRequest
         {
@@ -40,6 +42,12 @@ internal class ReadmeAIGeneratorShould
             .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
             .ReturnsAsync(openAiResponse);
 
+        string prompt = "📌 Prompt: Software Engineering Confidence Roadmap";
+
+        promptProviderMock
+            .Setup(provider => provider.GetRoadmapBaseAsync(request.Language))
+            .ReturnsAsync(prompt);
+
         #endregion
 
         #region Act
@@ -53,9 +61,8 @@ internal class ReadmeAIGeneratorShould
         // Verify the prompt was sent to the repository
         openAIRepositoryMock.Verify(
             repo => repo.GetResponse(It.Is<string>(prompt =>
-                prompt.Contains("📌 Prompt: Software Engineering Confidence Roadmap") &&
-                prompt.Contains("***Given this prompt, I want you to generate a readme in MarkDown***") &&
-                prompt.Contains($"All documentation, milestones, issues and code must be written **in {request.Language}**")
+                prompt.Contains(prompt) &&
+                prompt.Contains("***Given this prompt, I want you to generate a readme in MarkDown***")
             ), request.OpenAIKey),
             Times.Once()
         );

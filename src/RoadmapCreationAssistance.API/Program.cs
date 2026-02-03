@@ -34,6 +34,7 @@ builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
 builder.Services.AddScoped<IOpenAIRepository, OpenAIRepository>();
 builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
+builder.Services.AddScoped<IPromptProvider, PromptProvider>();
 builder.Services.AddScoped<IGithubRepository, GithubRepository>();
 builder.Services.AddScoped<IGitHubGraphQLClient, GitHubGraphQLClient>();
 
