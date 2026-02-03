@@ -16,18 +16,18 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddHttpClient(OpenAIRepository.HttpClientName, client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["OpenAIApiBaseUrl"]!);
+    client.BaseAddress = new Uri(builder.Configuration["OpenAIApi:BaseUrl"]!);
     client.Timeout = TimeSpan.FromSeconds(180);
 });
 
 builder.Services.AddHttpClient(GithubRepository.HttpClientName, client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["GitHubApiBaseUrl"]!);
+    client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
 });
 
 builder.Services.AddHttpClient(GitHubGraphQLClient.HttpClientName, client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["GitHubApiBaseUrl"]!);
+    client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
 });
 
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
@@ -37,7 +37,9 @@ builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
 builder.Services.AddScoped<IGithubRepository, GithubRepository>();
 builder.Services.AddScoped<IGitHubGraphQLClient, GitHubGraphQLClient>();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddUrlGroup(new Uri(builder.Configuration["GitHubApi:HealthCheckUrl"]!), "github")
+    .AddUrlGroup(new Uri(builder.Configuration["OpenAIApi:HealthCheckUrl"]!), "openai");
 
 var app = builder.Build();
 
@@ -51,11 +53,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.MapHealthChecks("/health");
 
