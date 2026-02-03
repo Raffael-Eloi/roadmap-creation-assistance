@@ -616,4 +616,72 @@ public class RoadmapCreatorShould
 
         #endregion
     }
+
+    [Test]
+    public async Task Return_Roadmap_Creation_Response()
+    {
+        #region Arrange
+
+        Milestone milestone1 = new()
+        {
+            Title = "My title 1",
+            Description = "My description 1",
+            Issues =
+            [
+                new Issue()
+                {
+                    Title = "My issue 1 from milestone 1"
+                },
+                new Issue()
+                {
+                    Title = "My issue 2 from milestone 1"
+                }
+            ]
+        };
+
+        Milestone milestone2 = new()
+        {
+            Title = "My title 2",
+            Description = "My description 2",
+            Issues =
+            [
+                new Issue()
+                {
+                    Title = "My issue 1 from milestone 2"
+                }
+            ]
+        };
+
+        List<Milestone> milestones = [milestone1, milestone2];
+
+        milestonesAiGeneratorMock
+            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+            .ReturnsAsync([milestone1, milestone2]);
+
+        string projectId = "123456";
+
+        githubRepositoryMock
+            .Setup(githubRepo => githubRepo.CreateProject(It.IsAny<Project>(), request))
+            .Callback<Project, RoadmapCreationRequest>((project, req) =>
+            {
+                project.Id = projectId;
+            });
+
+        #endregion
+
+        #region Act
+
+        RoadmapCreationResponse response = await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        response.ProjectId.Should().Be(projectId);
+        response.MilestonesCreatedCount.Should().Be(2);
+        response.IssuesCreatedCount.Should().Be(3);
+        response.ReadmeCreated.Should().BeTrue();
+
+        #endregion
+    }
 }

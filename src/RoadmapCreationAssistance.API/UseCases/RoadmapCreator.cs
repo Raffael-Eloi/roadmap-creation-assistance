@@ -7,7 +7,7 @@ namespace RoadmapCreationAssistance.API.UseCases;
 
 public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadmeAIGenerator readmeAIGenerator, IGithubRepository githubRepository) : IRoadmapCreator
 {
-    public async Task CreateAsync(RoadmapCreationRequest request)
+    public async Task<RoadmapCreationResponse> CreateAsync(RoadmapCreationRequest request)
     {
         await CreateLabels(request);
 
@@ -18,8 +18,10 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
         Project project = await CreateProject(request);
 
         await githubRepository.LinkIssuesToProject(project, issues, request);
-        
+
         await CreateReadme(request);
+        
+        return SuccessfulResponse(milestones, issues, project);
     }
 
     private async Task CreateLabels(RoadmapCreationRequest request)
@@ -54,7 +56,7 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
 
     private async Task<IEnumerable<Issue>> CreateIssues(RoadmapCreationRequest request, IEnumerable<Milestone> milestones)
     {
-        List<Issue> issues = [.. milestones.Where(milestone => milestone.Id.HasValue).SelectMany(milestone => milestone.Issues)];
+        List<Issue> issues = [.. milestones.SelectMany(milestone => milestone.Issues)];
         if (issues.Count == 0)
         {
             return issues;
@@ -68,7 +70,7 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
     {
         Project project = new()
         {
-            Title = "Roadmap - Software Engineer"
+            Title = Project.DefaultTitle
         };
 
         await githubRepository.CreateProject(project, request);
@@ -80,5 +82,16 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
         string readme = await readmeAIGenerator.GenerateAsync(request);
 
         await githubRepository.CreateReadme(readme, request);
+    }
+
+    private static RoadmapCreationResponse SuccessfulResponse(IEnumerable<Milestone> milestones, IEnumerable<Issue> issues, Project project)
+    {
+        return new RoadmapCreationResponse
+        {
+            ProjectId = project.Id!,
+            MilestonesCreatedCount = milestones.Count(),
+            IssuesCreatedCount = issues.Count(),
+            ReadmeCreated = true
+        };
     }
 }

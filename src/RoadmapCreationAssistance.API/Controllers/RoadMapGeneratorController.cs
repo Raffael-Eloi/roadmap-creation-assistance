@@ -11,8 +11,8 @@ public class RoadMapGeneratorController(IRoadmapCreator roadmapCreator) : Contro
     [HttpPost]
     public async Task<IActionResult> GenerateRoadMap([FromBody] RoadmapCreationRequest request)
     {
-        await roadmapCreator.CreateAsync(request);
+        RoadmapCreationResponse response = await roadmapCreator.CreateAsync(request);
 
-        return Ok("success");
+        return Ok(response);
     }
 }

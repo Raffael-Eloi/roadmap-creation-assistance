@@ -4,5 +4,5 @@ namespace RoadmapCreationAssistance.API.Contracts.UseCases;
 
 public interface IRoadmapCreator
 {
-    Task CreateAsync(RoadmapCreationRequest request);
+    Task<RoadmapCreationResponse> CreateAsync(RoadmapCreationRequest request);
 }
