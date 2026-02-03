@@ -2,6 +2,7 @@ using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Middlewares;
 using RoadmapCreationAssistance.API.Repositories.Github;
+using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
 using RoadmapCreationAssistance.API.UseCases;
 
@@ -24,11 +25,17 @@ builder.Services.AddHttpClient(GithubRepository.HttpClientName, client =>
     client.BaseAddress = new Uri(builder.Configuration["GitHubApiBaseUrl"]!);
 });
 
+builder.Services.AddHttpClient(GitHubGraphQLClient.HttpClientName, client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["GitHubApiBaseUrl"]!);
+});
+
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
 builder.Services.AddScoped<IOpenAIRepository, OpenAIRepository>();
 builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
 builder.Services.AddScoped<IGithubRepository, GithubRepository>();
+builder.Services.AddScoped<IGitHubGraphQLClient, GitHubGraphQLClient>();
 
 var app = builder.Build();
 
