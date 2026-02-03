@@ -64,4 +64,116 @@ internal class ReadmeAIGeneratorShould
 
         #endregion
     }
+
+    [Test]
+    public async Task Propagate_HttpRequestException_When_OpenAI_Request_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Error occurred while sending request to OpenAI API.";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ThrowsAsync(new HttpRequestException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await readmeAIGenerator.GenerateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<HttpRequestException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_OpenAI_Returns_No_Output()
+    {
+        #region Arrange
+
+        string expectedMessage = "No valid output found in OpenAI response.";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await readmeAIGenerator.GenerateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_OpenAI_Returns_No_Content()
+    {
+        #region Arrange
+
+        string expectedMessage = "No content found in OpenAI output.";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await readmeAIGenerator.GenerateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_OpenAI_Returns_Empty_Text()
+    {
+        #region Arrange
+
+        string expectedMessage = "OpenAI content text is empty.";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await readmeAIGenerator.GenerateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
 }

@@ -101,4 +101,86 @@ internal class MilestonesAIGeneratorShould
 
         #endregion
     }
+
+    [Test]
+    public async Task Throw_InvalidOperationException_When_Deserialization_Returns_Null()
+    {
+        #region Arrange
+
+        string invalidJsonResponse = "null";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ReturnsAsync(invalidJsonResponse);
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await milestonesAIGenerator.GenerateWithIssues(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage("Failed to deserialize milestones from AI response.");
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Throw_JsonException_When_Response_Is_Invalid_Json()
+    {
+        #region Arrange
+
+        string invalidJsonResponse = "this is not valid json";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ReturnsAsync(invalidJsonResponse);
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await milestonesAIGenerator.GenerateWithIssues(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should().ThrowAsync<JsonException>();
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_HttpRequestException_When_OpenAI_Request_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Error occurred while sending request to OpenAI API.";
+
+        openAIRepositoryMock
+            .Setup(repo => repo.GetResponse(It.IsAny<string>(), request.OpenAIKey))
+            .ThrowsAsync(new HttpRequestException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await milestonesAIGenerator.GenerateWithIssues(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<HttpRequestException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
 }

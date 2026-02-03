@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Entities;
@@ -384,6 +385,234 @@ public class RoadmapCreatorShould
         githubRepositoryMock
             .Verify(githubRepo => githubRepo.CreateReadme(readme, request),
             Times.Once);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_Milestones_Generation_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Failed to deserialize milestones from AI response.";
+
+        milestonesAiGeneratorMock
+            .Setup(generator => generator.GenerateWithIssues(request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_HttpRequestException_When_OpenAI_Request_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Error occurred while sending request to OpenAI API.";
+
+        milestonesAiGeneratorMock
+            .Setup(generator => generator.GenerateWithIssues(request))
+            .ThrowsAsync(new HttpRequestException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<HttpRequestException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_Labels_Creation_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Failed to create labels on GitHub.";
+
+        githubRepositoryMock
+            .Setup(repo => repo.CreateLabels(It.IsAny<IEnumerable<Label>>(), request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_Milestones_Creation_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Failed to create milestone 'Test Milestone'. Status code: BadRequest";
+
+        milestonesAiGeneratorMock
+            .Setup(generator => generator.GenerateWithIssues(request))
+            .ReturnsAsync([new Milestone { Title = "Test Milestone", Description = "Test", Issues = [] }]);
+
+        githubRepositoryMock
+            .Setup(repo => repo.CreateMilestones(It.IsAny<IEnumerable<Milestone>>(), request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_Project_Creation_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Could not create project on GitHub";
+
+        githubRepositoryMock
+            .Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_User_Id_Retrieval_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Could not retrieve user ID from GitHub";
+
+        githubRepositoryMock
+            .Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_Repository_Id_Retrieval_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "Could not retrieve repository ID from GitHub";
+
+        githubRepositoryMock
+            .Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Propagate_InvalidOperationException_When_Readme_Generation_Fails()
+    {
+        #region Arrange
+
+        string expectedMessage = "No valid output found in OpenAI response.";
+
+        readmeAiGeneratorMock
+            .Setup(generator => generator.GenerateAsync(request))
+            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+
+        #endregion
+
+        #region Act
+
+        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+
+        #endregion
+
+        #region Assert
+
+        await act.Should()
+            .ThrowAsync<InvalidOperationException>()
+            .WithMessage(expectedMessage);
 
         #endregion
     }

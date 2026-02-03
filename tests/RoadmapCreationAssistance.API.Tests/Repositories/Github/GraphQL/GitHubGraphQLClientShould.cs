@@ -15,6 +15,10 @@ public class GitHubGraphQLClientShould
     private GitHubGraphQLClient gitHubGraphQLClient;
     private const string Token = "test-token";
     private const string BaseUrl = "https://api.github.com";
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    };
 
     [SetUp]
     public void Setup()
@@ -22,7 +26,7 @@ public class GitHubGraphQLClientShould
         httpClientFactoryMock = new Mock<IHttpClientFactory>();
         httpMessageHandlerMock = new Mock<HttpMessageHandler>();
 
-        var httpClient = new HttpClient(httpMessageHandlerMock.Object)
+        HttpClient httpClient = new(httpMessageHandlerMock.Object)
         {
             BaseAddress = new Uri(BaseUrl)
         };
@@ -302,12 +306,9 @@ public class GitHubGraphQLClientShould
 
     private void SetupGraphQLResponse(object responseData)
     {
-        var jsonResponse = JsonSerializer.Serialize(responseData, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        string jsonResponse = JsonSerializer.Serialize(responseData, JsonOptions);
 
-        var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
+        HttpResponseMessage httpResponse = new(HttpStatusCode.OK)
         {
             Content = new StringContent(jsonResponse, System.Text.Encoding.UTF8, "application/json")
         };
@@ -323,15 +324,12 @@ public class GitHubGraphQLClientShould
 
     private void SetupGraphQLResponseWithErrors(params string[] errorMessages)
     {
-        var errors = errorMessages.Select(msg => new { message = msg }).ToArray();
-        var responseData = new { data = (object?)null, errors };
+        object[] errors = [.. errorMessages.Select(msg => new { message = msg })];
+        object responseData = new { data = (object?)null, errors };
 
-        var jsonResponse = JsonSerializer.Serialize(responseData, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
+        string jsonResponse = JsonSerializer.Serialize(responseData, JsonOptions);
 
-        var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
+        HttpResponseMessage httpResponse = new(HttpStatusCode.OK)
         {
             Content = new StringContent(jsonResponse, System.Text.Encoding.UTF8, "application/json")
         };
