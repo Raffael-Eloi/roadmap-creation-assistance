@@ -37,6 +37,8 @@ builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
 builder.Services.AddScoped<IGithubRepository, GithubRepository>();
 builder.Services.AddScoped<IGitHubGraphQLClient, GitHubGraphQLClient>();
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,5 +56,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+
+app.MapHealthChecks("/health");
 
 app.Run();
