@@ -2,7 +2,7 @@
 
 public interface IPromptProvider
 {
-    Task<string> GetRoadmapBaseAsync(string language);
+    Task<string> GetRoadmapBaseAsync(string language, string apiDomainDefinition);
 
-    Task<string> GetMilestoneInstructionAsync(string language);
+    Task<string> GetMilestoneInstructionAsync(string language, string apiDomainDefinition);
 }

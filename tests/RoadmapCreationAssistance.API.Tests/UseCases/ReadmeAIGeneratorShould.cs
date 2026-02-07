@@ -27,7 +27,8 @@ internal class ReadmeAIGeneratorShould
             GitHubOwner = "John",
             GitHubRepositoryName = "My repo",
             GitHubToken = "MYTOKEN",
-            OpenAIKey = "MYOPENAIKEY"
+            OpenAIKey = "MYOPENAIKEY",
+            ApiDomainDefinition = "MY API SPECS"
         };
     }
 
@@ -45,7 +46,7 @@ internal class ReadmeAIGeneratorShould
         string prompt = "📌 Prompt: Software Engineering Confidence Roadmap";
 
         promptProviderMock
-            .Setup(provider => provider.GetRoadmapBaseAsync(request.Language))
+            .Setup(provider => provider.GetRoadmapBaseAsync(request.Language, request.ApiDomainDefinition))
             .ReturnsAsync(prompt);
 
         #endregion

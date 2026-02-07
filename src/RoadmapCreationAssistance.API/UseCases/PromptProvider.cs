@@ -4,9 +4,9 @@ namespace RoadmapCreationAssistance.API.UseCases
 {
     public class PromptProvider : IPromptProvider
     {
-        public async Task<string> GetMilestoneInstructionAsync(string language)
+        public async Task<string> GetMilestoneInstructionAsync(string language, string apiDomainDefinition)
         {
-            string prompt = await GetRoadmapBaseAsync(language);
+            string prompt = await GetRoadmapBaseAsync(language, apiDomainDefinition);
             
             string currentDirectory = Directory.GetCurrentDirectory();
             string milestonesGenerationPromptPath = Path.Combine(currentDirectory, "PromptBase", "milestones_generation_instruction.md");
@@ -17,11 +17,12 @@ namespace RoadmapCreationAssistance.API.UseCases
             return prompt;
         }
 
-        public async Task<string> GetRoadmapBaseAsync(string language)
+        public async Task<string> GetRoadmapBaseAsync(string language, string apiDomainDefinition)
         {
             string currentDirectory = Directory.GetCurrentDirectory();
             string promptPath = Path.Combine(currentDirectory, "PromptBase", "roadmap_base.md");
             string prompt = await File.ReadAllTextAsync(promptPath);
+            prompt += apiDomainDefinition;
             prompt += $"All documentation, milestones, issues and code must be written **in {language}**";
             return prompt;
         }

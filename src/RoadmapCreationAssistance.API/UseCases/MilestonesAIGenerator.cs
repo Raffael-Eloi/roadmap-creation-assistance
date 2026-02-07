@@ -11,7 +11,7 @@ public class MilestonesAIGenerator(IPromptProvider promptProvider, IOpenAIReposi
 {
     public async Task<IEnumerable<Milestone>> GenerateWithIssues(RoadmapCreationRequest request)
     {
-        string prompt = await promptProvider.GetMilestoneInstructionAsync(request.Language);
+        string prompt = await promptProvider.GetMilestoneInstructionAsync(request.Language, request.ApiDomainDefinition);
 
         string response = await openAIRepository.GetResponse(prompt, request.OpenAIKey);
 

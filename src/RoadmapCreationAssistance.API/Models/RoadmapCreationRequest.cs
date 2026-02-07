@@ -26,4 +26,9 @@ public sealed class RoadmapCreationRequest
 
     [AllowedValues(["English-US", "Portuguese-BR"])]
     public string Language { get; set; } = "English-US";
+
+    [Required(AllowEmptyStrings = false)]
+    [MinLength(10)]
+    [MaxLength(250)]
+    public required string ApiDomainDefinition { get; set; }
 }

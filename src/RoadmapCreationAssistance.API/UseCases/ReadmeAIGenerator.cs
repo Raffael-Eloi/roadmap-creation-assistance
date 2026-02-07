@@ -8,14 +8,14 @@ public class ReadmeAIGenerator(IPromptProvider promptProvider, IOpenAIRepository
 {
     public async Task<string> GenerateAsync(RoadmapCreationRequest request)
     {
-        string prompt = await GetRoadmapPrompt(request.Language);
+        string prompt = await GetRoadmapPrompt(request.Language, request.ApiDomainDefinition);
 
         return await openAIRepository.GetResponse(prompt, request.OpenAIKey);
     }
 
-    private async Task<string> GetRoadmapPrompt(string language)
+    private async Task<string> GetRoadmapPrompt(string language, string apiDomainDefinition)
     {
-        string prompt = await promptProvider.GetRoadmapBaseAsync(language);
+        string prompt = await promptProvider.GetRoadmapBaseAsync(language, apiDomainDefinition);
         prompt += $"***Given this prompt, I want you to generate a readme in MarkDown***";
         return prompt;
     }

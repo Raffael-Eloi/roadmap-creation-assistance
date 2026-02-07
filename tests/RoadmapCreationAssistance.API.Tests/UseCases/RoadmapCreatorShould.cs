@@ -29,7 +29,8 @@ public class RoadmapCreatorShould
             GitHubOwner = "John",
             GitHubRepositoryName = "My repo",
             GitHubToken = "MYTOKEN",
-            OpenAIKey = "MYOPENAIKEY"
+            OpenAIKey = "MYOPENAIKEY",
+            ApiDomainDefinition = "MY API SPECS"
         };
     }
 

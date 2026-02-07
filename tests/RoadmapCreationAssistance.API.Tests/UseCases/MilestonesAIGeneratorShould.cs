@@ -29,7 +29,8 @@ internal class MilestonesAIGeneratorShould
             GitHubOwner = "John",
             GitHubRepositoryName = "My repo",
             GitHubToken = "MYTOKEN",
-            OpenAIKey = "MYOPENAIKEY"
+            OpenAIKey = "MYOPENAIKEY",
+            ApiDomainDefinition = "MY API SPECS"
         };
     }
 
@@ -79,7 +80,7 @@ internal class MilestonesAIGeneratorShould
         string prompt = "Prompt: Software Engineering Confidence Roadmap";
 
         promptProviderMock
-            .Setup(provider => provider.GetMilestoneInstructionAsync(request.Language))
+            .Setup(provider => provider.GetMilestoneInstructionAsync(request.Language, request.ApiDomainDefinition))
             .ReturnsAsync(prompt);
 
         #endregion

@@ -26,7 +26,7 @@ internal class PromptProviderShould
 
         #region Act
 
-        string result = await promptProvider.GetMilestoneInstructionAsync(language);
+        string result = await promptProvider.GetRoadmapBaseAsync(language, string.Empty);
 
         #endregion
 
@@ -34,6 +34,30 @@ internal class PromptProviderShould
 
         result.Should().Contain($"📌 Prompt: Software Engineering Confidence Roadmap");
         result.Should().Contain($"All documentation, milestones, issues and code must be written **in {language}**");
+
+        #endregion
+    }
+
+    [Test]
+    public async Task Get_Prompt_Base_With_Domain_Definition()
+    {
+        #region Arrange
+
+        string domainDefinition = "## Domain Definition\n" +
+                                  "The domain is an API of Car Managament\n" +
+                                  "### Features\n" +
+                                  "- CRUD car\n";
+        #endregion
+
+        #region Act
+
+        string result = await promptProvider.GetRoadmapBaseAsync("English-US", domainDefinition);
+
+        #endregion
+
+        #region Assert
+
+        result.Should().Contain(domainDefinition);
 
         #endregion
     }
@@ -49,7 +73,7 @@ internal class PromptProviderShould
 
         #region Act
 
-        string result = await promptProvider.GetMilestoneInstructionAsync(language);
+        string result = await promptProvider.GetMilestoneInstructionAsync(language, string.Empty);
 
         #endregion
 
