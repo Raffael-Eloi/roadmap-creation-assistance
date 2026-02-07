@@ -6,7 +6,7 @@ namespace RoadmapCreationAssistance.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class RoadMapGeneratorController(IRoadmapCreator roadmapCreator) : ControllerBase
+public sealed class RoadMapGeneratorController(IRoadmapCreator roadmapCreator) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> GenerateRoadMap([FromBody] RoadmapCreationRequest request)
