@@ -2,16 +2,15 @@
 
 Given this prompt, I want you to generate milestones with issues based on this roadmap.
 
-**IMPORTANT**: 
+**IMPORTANT**:
 - The answer needs to be exactly an array of Milestones, because I will deserialize the answer to this model in my .NET application.
 - The milestone description property should use markdown and should be very detailed, simulating an Epic in the agile development
 - The issue body property should use markdown and should be very detailed, simulating a Story in the agile development
 - The instructions should be clear to a Junior Software Engineer or someone that does not have solid experience in the area
 
-
 Here's my classes:
 
-```
+```csharp
 public class Milestone
 {
     // Do not populate the Id
@@ -25,7 +24,7 @@ public class Milestone
 }
 ```
 
-```
+```csharp
 public class Issue
 {
     public required string Title { get; set; }
