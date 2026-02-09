@@ -67,3 +67,4 @@ To create the roadmap, you need to send the following information in the request
 - API domain definition (the short project description)
 
 ## Preview
+![Image](https://github.com/user-attachments/assets/fe5a380b-2816-4104-823a-7c13ac95a25e)
