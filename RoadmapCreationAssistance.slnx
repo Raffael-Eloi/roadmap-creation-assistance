@@ -3,6 +3,7 @@
     <File Path=".dockerignore" />
     <File Path=".github/workflows/ci-cd-pipeline.yml" />
     <File Path="Dockerfile" />
+    <File Path="README.md" />
   </Folder>
   <Project Path="src/RoadmapCreationAssistance.API/RoadmapCreationAssistance.API.csproj" Id="e964bbcb-c13c-42d1-83d3-f61ee1f10772" />
   <Project Path="tests/RoadmapCreationAssistance.API.Tests/RoadmapCreationAssistance.API.Tests.csproj" Id="97f00470-9f3e-42e8-965d-671d9d50e851" />
