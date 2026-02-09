@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Entities;
 
-public class Milestone
+public sealed class Milestone
 {
     public int? Id { get; set; }
 

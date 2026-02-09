@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Entities;
 
-public class Issue
+public sealed class Issue
 {
     public required string Title { get; init; }
 

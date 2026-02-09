@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Entities;
 
-public class Label
+public sealed class Label
 {
     public required string Name { get; set; }
 

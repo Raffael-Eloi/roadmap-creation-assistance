@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Entities;
 
-public class Project
+public sealed class Project
 {
     public const string DefaultTitle = "Roadmap - Software Engineer";
 

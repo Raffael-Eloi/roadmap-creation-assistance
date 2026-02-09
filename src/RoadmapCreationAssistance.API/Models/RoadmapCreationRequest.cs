@@ -2,7 +2,7 @@
 
 namespace RoadmapCreationAssistance.API.Models;
 
-public sealed class RoadmapCreationRequest
+public sealed record RoadmapCreationRequest
 {
     [Required(AllowEmptyStrings = false)]
     [MinLength(5)]

@@ -1,6 +1,6 @@
 ﻿namespace RoadmapCreationAssistance.API.Models;
 
-public sealed class RoadmapCreationResponse
+public sealed record RoadmapCreationResponse
 {
     public required string ProjectId { get; set; }
 
