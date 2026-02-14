@@ -38,6 +38,10 @@ The issues are divided into three categories:
 
 Go to the OpenAI API website, purchase some credits, and generate an OpenAI API key.
 
+You can access the OpenAI API docs and pricing details here: https://developers.openai.com/api/docs
+
+For my personal use, I bought the $5 package, which gives you more than enough tokens for a few months of use using the GPT-5 mini model.
+
 2 – Create a personal access token on GitHub
 
 You need to create a personal access token in your GitHub account.
