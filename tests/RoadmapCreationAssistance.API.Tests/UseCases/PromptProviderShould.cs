@@ -43,10 +43,7 @@ internal class PromptProviderShould
     {
         #region Arrange
 
-        string domainDefinition = "## Domain Definition\n" +
-                                  "The domain is an API of Car Managament\n" +
-                                  "### Features\n" +
-                                  "- CRUD car\n";
+        string domainDefinition = "CRUD of Car Managament";
         #endregion
 
         #region Act
@@ -57,6 +54,7 @@ internal class PromptProviderShould
 
         #region Assert
 
+        result.Should().Contain($"The context is {domainDefinition}");
         result.Should().Contain(domainDefinition);
 
         #endregion

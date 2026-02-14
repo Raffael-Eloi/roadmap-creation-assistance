@@ -89,6 +89,16 @@ It reinforces the idea that:
 
 ---
 
+## Project context - API Domain
+The project should be very simple. 
+The difference comes from the details, practices, and fundamentals applied around the project, which shape the roadmap.
+Key concepts:
+- Please don't focus on the project complexity, but rather on the engineering practices and mindset growth.
+- The project should be a simple API (CRUD operations).
+- The context is [API-DOMAIN-TO-BE-REPLACED]
+
+___
+
 ## Milestone 0 — Git and GitHub Fundamentals
 
 Build the foundation for **collaboration, history tracking, and professional workflows**.

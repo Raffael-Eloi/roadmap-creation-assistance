@@ -22,7 +22,7 @@ namespace RoadmapCreationAssistance.API.UseCases
             string currentDirectory = Directory.GetCurrentDirectory();
             string promptPath = Path.Combine(currentDirectory, "PromptBase", "roadmap_base.md");
             string prompt = await File.ReadAllTextAsync(promptPath);
-            prompt += apiDomainDefinition;
+            prompt = prompt.Replace("[API-DOMAIN-TO-BE-REPLACED]", apiDomainDefinition);
             prompt += $"All documentation, milestones, issues and code must be written **in {language}**";
             return prompt;
         }
