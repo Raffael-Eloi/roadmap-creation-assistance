@@ -63,7 +63,7 @@ internal class ReadmeAIGeneratorShould
         openAIRepositoryMock.Verify(
             repo => repo.GetResponse(It.Is<string>(prompt =>
                 prompt.Contains(prompt) &&
-                prompt.Contains("***Given this prompt, I want you to generate a readme in MarkDown***")
+                prompt.Contains("***Given this prompt, I want you to generate a readme in MarkDown. The answer will be used by my API to update the readme, so please only return the specific response.***")
             ), request.OpenAIKey),
             Times.Once()
         );

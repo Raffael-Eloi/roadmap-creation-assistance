@@ -16,7 +16,7 @@ public class ReadmeAIGenerator(IPromptProvider promptProvider, IOpenAIRepository
     private async Task<string> GetRoadmapPrompt(string language, string apiDomainDefinition)
     {
         string prompt = await promptProvider.GetRoadmapBaseAsync(language, apiDomainDefinition);
-        prompt += $"***Given this prompt, I want you to generate a readme in MarkDown***";
+        prompt += $"***Given this prompt, I want you to generate a readme in MarkDown. The answer will be used by my API to update the readme, so please only return the specific response.***";
         return prompt;
     }
 }
