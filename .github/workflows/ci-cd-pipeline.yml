@@ -89,3 +89,4 @@ jobs:
           imageToDeploy: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:latest
           resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
           containerAppName: ${{ secrets.CONTAINER_APP_NAME }}
+          targetPort: 8080
