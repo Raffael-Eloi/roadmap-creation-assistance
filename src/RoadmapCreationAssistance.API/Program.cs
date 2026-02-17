@@ -22,7 +22,7 @@ ILogger httpPolicyLogger = loggerFactory.CreateLogger("HttpPolicies");
 builder.Services.AddHttpClient(OpenAIRepository.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["OpenAIApi:BaseUrl"]!);
-    client.Timeout = TimeSpan.FromSeconds(180);
+    client.Timeout = TimeSpan.FromSeconds(240);
 })
 .AddPolicyHandler(HttpPolicies.GetOpenAIRetryPolicy(httpPolicyLogger));
 
