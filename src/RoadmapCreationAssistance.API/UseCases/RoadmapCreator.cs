@@ -9,18 +9,16 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
 {
     public async Task<RoadmapCreationResponse> CreateAsync(RoadmapCreationRequest request)
     {
-        await CreateLabels(request);
+        Task labelsTask = CreateLabels(request);
 
-        IEnumerable<Milestone> milestones = await CreateMilestones(request);
+        Task<(IEnumerable<Milestone>, IEnumerable<Issue>, Project)> coreTask = CreateCoreRoadmap(request);
 
-        IEnumerable<Issue> issues = await CreateIssues(request, milestones);
+        Task readmeTask = CreateReadme(request);
 
-        Project project = await CreateProject(request);
+        await Task.WhenAll(labelsTask, coreTask, readmeTask);
 
-        await githubRepository.LinkIssuesToProject(project, issues, request);
+        (IEnumerable<Milestone> milestones, IEnumerable<Issue> issues, Project project) = coreTask.Result;
 
-        await CreateReadme(request);
-        
         return SuccessfulResponse(milestones, issues, project);
     }
 
@@ -29,6 +27,23 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
         IEnumerable<Label> labels = Label.GenerateDefaultLabels();
 
         await githubRepository.CreateLabels(labels, request);
+    }
+
+    private async Task<(IEnumerable<Milestone>, IEnumerable<Issue>, Project)> CreateCoreRoadmap(
+        RoadmapCreationRequest request)
+    {
+        IEnumerable<Milestone> milestones = await CreateMilestones(request);
+
+        Task<IEnumerable<Issue>> issuesTask = CreateIssues(request, milestones);
+        Task<Project> projectTask = CreateProject(request);
+        await Task.WhenAll(issuesTask, projectTask);
+
+        IEnumerable<Issue> issues = issuesTask.Result;
+        Project project = projectTask.Result;
+
+        await githubRepository.LinkIssuesToProject(project, issues, request);
+
+        return (milestones, issues, project);
     }
 
     private async Task<IEnumerable<Milestone>> CreateMilestones(RoadmapCreationRequest request)
