@@ -25,6 +25,20 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
+# Install Datadog .NET tracer for APM auto-instrumentation
+RUN apt-get update \
+    && apt-get install -y curl \
+    && curl -LO https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/datadog-dotnet-apm_amd64.deb \
+    && dpkg -i datadog-dotnet-apm_amd64.deb \
+    && rm -rf datadog-dotnet-apm_amd64.deb /var/lib/apt/lists/*
+
+ENV CORECLR_ENABLE_PROFILING=1
+ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+ENV CORECLR_PROFILER_PATH=/opt/datadog/Datadog.Trace.ClrProfiler.Native.so
+ENV DD_DOTNET_TRACER_HOME=/opt/datadog
+ENV DD_SERVICE=roadmap-creation-assistance
+ENV DD_AGENT_HOST=localhost
+
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD curl --fail http://localhost:8080/health || exit 1
