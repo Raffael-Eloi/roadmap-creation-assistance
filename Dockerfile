@@ -26,8 +26,9 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Install Datadog .NET tracer for APM auto-instrumentation
-ADD https://github.com/DataDog/dd-trace-dotnet/releases/latest/download/datadog-dotnet-apm-amd64.tar.gz /opt/datadog/
-RUN mkdir -p /opt/datadog && cd /opt/datadog && tar -xzf datadog-dotnet-apm-amd64.tar.gz && rm datadog-dotnet-apm-amd64.tar.gz
+ARG DD_TRACER_VERSION=3.37.0
+ADD https://github.com/DataDog/dd-trace-dotnet/releases/download/v${DD_TRACER_VERSION}/datadog-dotnet-apm-${DD_TRACER_VERSION}.tar.gz /opt/datadog/
+RUN cd /opt/datadog && tar -xzf datadog-dotnet-apm-${DD_TRACER_VERSION}.tar.gz && rm datadog-dotnet-apm-${DD_TRACER_VERSION}.tar.gz
 
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
