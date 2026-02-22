@@ -1,12 +1,12 @@
-using System.Net;
 using Polly;
 using Polly.Extensions.Http;
+using System.Net;
 
 namespace RoadmapCreationAssistance.API.Policies;
 
-public static class HttpPolicies
+public class HttpPolicies(ILogger<HttpPolicies> logger)
 {
-    public static IAsyncPolicy<HttpResponseMessage> GetGitHubRetryPolicy(ILogger logger)
+    public IAsyncPolicy<HttpResponseMessage> GetGitHubRetryPolicy()
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
@@ -33,7 +33,7 @@ public static class HttpPolicies
                 });
     }
 
-    public static IAsyncPolicy<HttpResponseMessage> GetOpenAIRetryPolicy(ILogger logger)
+    public IAsyncPolicy<HttpResponseMessage> GetOpenAIRetryPolicy()
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()

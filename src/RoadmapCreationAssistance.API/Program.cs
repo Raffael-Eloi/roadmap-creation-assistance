@@ -6,37 +6,52 @@ using RoadmapCreationAssistance.API.Repositories.Github;
 using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
 using RoadmapCreationAssistance.API.UseCases;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSerilog((ctx, lc) =>
+    lc.ReadFrom.Configuration(ctx.Configuration)
+      .Enrich.FromLogContext()
+);
 
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// Create logger for HTTP policy logging
-using ILoggerFactory loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.AddConsole());
-ILogger httpPolicyLogger = loggerFactory.CreateLogger("HttpPolicies");
+builder.Services.AddSingleton<HttpPolicies>();
 
 builder.Services.AddHttpClient(OpenAIRepository.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["OpenAIApi:BaseUrl"]!);
     client.Timeout = TimeSpan.FromSeconds(240);
 })
-.AddPolicyHandler(HttpPolicies.GetOpenAIRetryPolicy(httpPolicyLogger));
+.AddPolicyHandler((sp, _) =>
+{
+    HttpPolicies policies = sp.GetRequiredService<HttpPolicies>();
+    return policies.GetOpenAIRetryPolicy();
+});
 
 builder.Services.AddHttpClient(GithubRepository.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
 })
-.AddPolicyHandler(HttpPolicies.GetGitHubRetryPolicy(httpPolicyLogger));
+.AddPolicyHandler((sp, _) =>
+{
+    HttpPolicies policies = sp.GetRequiredService<HttpPolicies>();
+    return policies.GetGitHubRetryPolicy();
+});
 
 builder.Services.AddHttpClient(GitHubGraphQLClient.HttpClientName, client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
 })
-.AddPolicyHandler(HttpPolicies.GetGitHubRetryPolicy(httpPolicyLogger));
+.AddPolicyHandler((sp, _) =>
+{
+    HttpPolicies policies = sp.GetRequiredService<HttpPolicies>();
+    return policies.GetGitHubRetryPolicy();
+});
 
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
@@ -52,7 +67,6 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
