@@ -32,6 +32,8 @@ COPY --from=datadog/dd-lib-dotnet-init /datadog-init/monitoring-home/ /dd_tracer
 # Datadog .NET APM configuration
 ENV DD_SERVICE=roadmap-creation-assistance
 ENV DD_TRACE_ENABLED=true
+ENV DD_APM_ENABLED=true
+ENV DD_APM_NON_LOCAL_TRAFFIC=true
 ENV DD_DOTNET_TRACER_HOME=/dd_tracer/dotnet
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
