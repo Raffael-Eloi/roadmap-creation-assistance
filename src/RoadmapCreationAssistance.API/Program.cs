@@ -7,13 +7,29 @@ using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
 using RoadmapCreationAssistance.API.UseCases;
 using Serilog;
+using Serilog.Sinks.Datadog.Logs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((ctx, lc) =>
-    lc.ReadFrom.Configuration(ctx.Configuration)
-      .Enrich.FromLogContext()
-);
+{
+    lc.Enrich.FromLogContext()
+      .WriteTo.Console();
+
+    string? ddApiKey = Environment.GetEnvironmentVariable("DD_API_KEY");
+
+    if (!string.IsNullOrWhiteSpace(ddApiKey))
+    {
+        var datadogConfig = new DatadogConfiguration
+        {
+            Url = "intake.logs.datadoghq.com",
+            Port = 10516,
+            UseSSL = true,
+            UseTCP = true
+        };
+        lc.WriteTo.DatadogLogs(ddApiKey, configuration: datadogConfig);
+    }
+});
 
 builder.Services.AddControllers();
 
