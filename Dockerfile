@@ -28,7 +28,15 @@ COPY --from=publish /app/publish .
 # Install Datadog serverless-init and .NET tracer
 COPY --from=datadog/serverless-init:1-alpine /datadog-init /app/datadog-init
 COPY --from=datadog/dd-lib-dotnet-init /datadog-init/monitoring-home/ /dd_tracer/dotnet/
+
+# Datadog .NET APM configuration
 ENV DD_SERVICE=roadmap-creation-assistance
+ENV DD_TRACE_ENABLED=true
+ENV DD_DOTNET_TRACER_HOME=/dd_tracer/dotnet
+ENV CORECLR_ENABLE_PROFILING=1
+ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+ENV CORECLR_PROFILER_PATH=/dd_tracer/dotnet/linux-x64/Datadog.Trace.ClrProfiler.Native.so
+ENV DD_TRACE_LOG_DIRECTORY=/var/log/datadog/dotnet
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
