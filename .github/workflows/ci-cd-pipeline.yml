@@ -90,3 +90,4 @@ jobs:
           resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
           containerAppName: ${{ secrets.CONTAINER_APP_NAME }}
           targetPort: 8080
+          environmentVariables: DD_API_KEY=secretref:dd-api-key DD_SITE=us3.datadoghq.com
