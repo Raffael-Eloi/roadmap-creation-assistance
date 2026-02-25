@@ -1,0 +1,10 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    entrypoint: ["dotnet", "RoadmapCreationAssistance.API.dll"]
+    command: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CORECLR_ENABLE_PROFILING=0
