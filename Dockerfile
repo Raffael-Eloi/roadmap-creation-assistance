@@ -27,7 +27,7 @@ COPY --from=publish /app/publish .
 
 # Install Datadog serverless-init and .NET tracer
 COPY --from=datadog/serverless-init:1-alpine /datadog-init /app/datadog-init
-COPY --from=datadog/dd-lib-dotnet-init /datadog-init/monitoring-home/ /dd_tracer/dotnet/
+COPY --from=datadog/dd-lib-dotnet-init:latest-musl /datadog-init/monitoring-home/ /dd_tracer/dotnet/
 
 # Datadog .NET APM configuration
 ENV DD_SERVICE=roadmap-creation-assistance
