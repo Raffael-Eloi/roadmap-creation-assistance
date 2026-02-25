@@ -22,7 +22,7 @@ builder.Host.UseSerilog((ctx, lc) =>
     {
         var datadogConfig = new DatadogConfiguration
         {
-            Url = "intake.logs.datadoghq.com",
+            Url = "intake.logs.us3.datadoghq.com",
             Port = 10516,
             UseSSL = true,
             UseTCP = true
