@@ -35,12 +35,12 @@ ENV DD_TRACE_ENABLED=true
 ENV DD_DOTNET_TRACER_HOME=/dd_tracer/dotnet
 ENV CORECLR_ENABLE_PROFILING=1
 ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
-ENV CORECLR_PROFILER_PATH=/dd_tracer/dotnet/linux-x64/Datadog.Trace.ClrProfiler.Native.so
+ENV CORECLR_PROFILER_PATH=/dd_tracer/dotnet/linux-musl-x64/Datadog.Trace.ClrProfiler.Native.so
 ENV DD_TRACE_LOG_DIRECTORY=/var/log/datadog/dotnet
 
-# Health check
+# Health check (wget is available in Alpine by default, curl is not)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl --fail http://localhost:8080/health || exit 1
+    CMD wget --spider --quiet http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["/app/datadog-init"]
 CMD ["dotnet", "RoadmapCreationAssistance.API.dll"]
