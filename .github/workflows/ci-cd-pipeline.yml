@@ -46,10 +46,16 @@ jobs:
     name: Push Image to Docker Hub
     runs-on: ubuntu-latest
     needs: tests
+    outputs:
+      image-tag: ${{ steps.datetime.outputs.now }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
+      - name: Get current datetime
+        id: datetime
+        run: echo "now=$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
+        
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -66,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:latest
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:${{ steps.datetime.outputs.now }}
 
   deployToAzureContainerApp:
     name: Deploy to Azure Container App
@@ -86,7 +92,7 @@ jobs:
       - name: Deploy to Azure Container App
         uses: azure/container-apps-deploy-action@v2
         with:
-          imageToDeploy: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:latest
+          imageToDeploy: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:${{ needs.pushImageToDockerHub.outputs.image-tag }}
           resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
           containerAppName: ${{ secrets.CONTAINER_APP_NAME }}
           targetPort: 8080
