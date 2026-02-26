@@ -54,8 +54,8 @@ jobs:
         
       - name: Get current datetime
         id: datetime
-        run: echo "now=$(date -u +'%Y%m%d%H%M%S')" >> $GITHUB_OUTPUT
-        
+        run: echo "now=$(date -u +'%Y-%m-%d--%H.%M.%S')" >> $GITHUB_OUTPUT
+
       - name: Build and tag image
         run: |
           docker build \
