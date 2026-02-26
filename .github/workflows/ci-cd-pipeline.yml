@@ -90,13 +90,17 @@ jobs:
           subscription-id: ${{ secrets.ROADMAPCREATIONASSISTANCE_AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure Container App
-        uses: azure/container-apps-deploy-action@v2
-        with:
-          imageToDeploy: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:${{ needs.pushImageToDockerHub.outputs.image-tag }}
-          resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
-          containerAppName: ${{ secrets.CONTAINER_APP_NAME }}
-          targetPort: 8080
-          environmentVariables: DD_API_KEY=secretref:dd-api-key DD_SITE=us3.datadoghq.com
-          registryUrl: registry.hub.docker.com
-          registryUsername: ${{ vars.DOCKERHUB_USERNAME }}
-          registryPassword: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          az containerapp update \
+            --name ${{ secrets.CONTAINER_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+            --image ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:${{ needs.pushImageToDockerHub.outputs.image-tag }} \
+            --replace-env-vars \
+              DD_API_KEY=${{ secrets.DD_API_KEY }} \
+              DD_SITE=us3.datadoghq.com \
+              DD_SERVICE=roadmap-creation-assistance \
+              DD_ENV=production \
+              DD_VERSION=${{ needs.pushImageToDockerHub.outputs.image-tag }} \
+              DD_TRACE_ENABLED=true \
+              DD_RUNTIME_METRICS_ENABLED=true \
+              LD_PRELOAD=/dd_tracer/dotnet/linux-musl-x64/Datadog.Linux.ApiWrapper.x64.so
