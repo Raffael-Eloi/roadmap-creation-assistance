@@ -91,3 +91,6 @@ jobs:
           containerAppName: ${{ secrets.CONTAINER_APP_NAME }}
           targetPort: 8080
           environmentVariables: DD_API_KEY=secretref:dd-api-key DD_SITE=us3.datadoghq.com
+          registryUrl: registry.hub.docker.com
+          registryUsername: ${{ vars.DOCKERHUB_USERNAME }}
+          registryPassword: ${{ secrets.DOCKERHUB_TOKEN }}
