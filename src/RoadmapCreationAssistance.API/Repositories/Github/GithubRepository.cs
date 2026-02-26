@@ -3,22 +3,26 @@ using RoadmapCreationAssistance.API.Entities;
 using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.Models;
 using RoadmapCreationAssistance.API.Repositories.Github.Models;
+using Serilog.Core;
 using System.Net.Http.Headers;
 
 namespace RoadmapCreationAssistance.API.Repositories.Github;
 
-public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraphQLClient graphQLClient) : IGithubRepository
+public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraphQLClient graphQLClient, ILogger<GithubRepository> logger) : IGithubRepository
 {
     public const string HttpClientName = "GitHub";
 
     public async Task CreateLabels(IEnumerable<Label> labels, RoadmapCreationRequest request)
     {
+        logger.LogInformation("Creating labels for repository {Owner}/{Repo}", request.GitHubOwner, request.GitHubRepositoryName);
+
         HttpClient httpClient = CreateHttpClient(request);
 
         foreach (Label label in labels)
         {
             HttpContent labelContent = label.ToJsonContent();
             await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", labelContent);
+            logger.LogInformation("Created label '{LabelName}' for repository {Owner}/{Repo}", label.Name, request.GitHubOwner, request.GitHubRepositoryName);
         }
     }
 
@@ -32,6 +36,7 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
 
     public async Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request)
     {
+        logger.LogInformation("Creating milestones for repository {Owner}/{Repo}", request.GitHubOwner, request.GitHubRepositoryName);
         HttpClient httpClient = CreateHttpClient(request);
 
         foreach (Milestone milestone in milestones)
@@ -47,6 +52,8 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
 
             if (!response.IsSuccessStatusCode)
                 throw new InvalidOperationException($"Failed to create milestone '{milestone.Title}'. Status code: {response.StatusCode}");
+
+            logger.LogInformation("Created milestone '{MilestoneTitle}' for repository {Owner}/{Repo}", milestone.Title, request.GitHubOwner, request.GitHubRepositoryName);
 
             GithubMilestone milestoneResponse = await response.DeserializeAsync<GithubMilestone>();
             milestone.Id = milestoneResponse.Number!.Value;
@@ -69,6 +76,7 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
 
     public async Task CreateProject(Project project, RoadmapCreationRequest request)
     {
+        logger.LogInformation("Creating project '{ProjectTitle}' for repository {Owner}/{Repo}", project.Title, request.GitHubOwner, request.GitHubRepositoryName);
         string ownerId = await graphQLClient.GetUserIdAsync(request.GitHubOwner, request.GitHubToken);
 
         string projectId = await graphQLClient.CreateProjectAsync(ownerId, project.Title, request.GitHubToken);
@@ -84,6 +92,7 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
 
     public async Task LinkIssuesToProject(Project project, IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {
+        logger.LogInformation("Linking issues to project '{ProjectTitle}' for repository {Owner}/{Repo}", project.Title, request.GitHubOwner, request.GitHubRepositoryName);
         foreach (Issue issue in issues)
         {
             if (!issue.Number.HasValue)
@@ -109,6 +118,7 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
 
     public async Task CreateReadme(string readme, RoadmapCreationRequest request)
     {
+        logger.LogInformation("Creating README.md for repository {Owner}/{Repo}", request.GitHubOwner, request.GitHubRepositoryName);
         HttpClient httpClient = CreateHttpClient(request);
 
         UpdateContent content = new()
