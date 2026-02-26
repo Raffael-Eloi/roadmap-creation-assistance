@@ -22,12 +22,17 @@ builder.Host.UseSerilog((ctx, lc) =>
     {
         var datadogConfig = new DatadogConfiguration
         {
-            Url = "intake.logs.us3.datadoghq.com",
-            Port = 10516,
+            Url = "https://http-intake.logs.us3.datadoghq.com",
+            Port = 443,
             UseSSL = true,
-            UseTCP = true
+            UseTCP = false
         };
-        lc.WriteTo.DatadogLogs(ddApiKey, configuration: datadogConfig);
+        lc.WriteTo.DatadogLogs(
+            ddApiKey,
+            configuration: datadogConfig,
+            service: Environment.GetEnvironmentVariable("DD_SERVICE") ?? "roadmap-creation-assistance-api",
+            host: Environment.MachineName
+        );
     }
 });
 

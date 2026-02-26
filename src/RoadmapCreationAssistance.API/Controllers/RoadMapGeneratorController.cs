@@ -8,6 +8,14 @@ namespace RoadmapCreationAssistance.API.Controllers;
 [ApiController]
 public sealed class RoadMapGeneratorController(IRoadmapCreator roadmapCreator, ILogger<RoadMapGeneratorController> logger) : ControllerBase
 {
+    [HttpGet("ping")]
+    public IActionResult Ping()
+    {
+        logger.LogInformation("Ping endpoint hit at {Time}", DateTime.UtcNow);
+        logger.LogWarning("This is a test warning log for Datadog");
+        return Ok(new { message = "pong", timestamp = DateTime.UtcNow });
+    }
+
     [HttpPost]
     public async Task<IActionResult> GenerateRoadMap([FromBody] RoadmapCreationRequest request)
     {
