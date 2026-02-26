@@ -99,4 +99,6 @@ jobs:
               DD_VERSION=${{ needs.pushImageToDockerHub.outputs.image-tag }} \
               DD_TRACE_ENABLED=true \
               DD_RUNTIME_METRICS_ENABLED=true \
+              DD_TRACE_AGENT_URL=https://trace.agent.us3.datadoghq.com \
+              DD_CIVISIBILITY_AGENTLESS_ENABLED=true \
               LD_PRELOAD=/dd_tracer/dotnet/linux-musl-x64/Datadog.Linux.ApiWrapper.x64.so
