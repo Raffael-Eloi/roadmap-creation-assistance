@@ -33,5 +33,8 @@ ENV DD_SERVICE=roadmap-creation-assistance
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --spider --quiet http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["/app/datadog-init"]
+# Debug: capture datadog-init output before it crashes
+RUN printf '#!/bin/sh\necho "=== DEBUG: Starting datadog-init ==="\necho "=== ENV ==="\nenv | grep -E "^DD_|^LD_|^CORECLR" | sort\necho "=== datadog-init file info ==="\nfile /app/datadog-init 2>/dev/null || echo "file command not available"\nls -la /app/datadog-init\necho "=== Attempting to run datadog-init ==="\n/app/datadog-init "$@" 2>&1\nEXIT_CODE=$?\necho "=== datadog-init exited with code: $EXIT_CODE ==="\nexit $EXIT_CODE\n' > /app/debug-entrypoint.sh && chmod +x /app/debug-entrypoint.sh
+
+ENTRYPOINT ["/app/debug-entrypoint.sh"]
 CMD ["dotnet", "RoadmapCreationAssistance.API.dll"]
