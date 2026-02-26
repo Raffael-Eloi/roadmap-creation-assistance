@@ -71,9 +71,7 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
-          #context: .
           push: true
-          #platforms: linux/amd64
           tags: ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:${{ steps.datetime.outputs.now }}
 
   deployToAzureContainerApp:
