@@ -79,8 +79,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"Raffael-Eloi_roadmap-creation-assistance" /o:"raffael-eloi" /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-          dotnet build
+          ${{ runner.temp }}\scanner\dotnet-sonarscanner begin /k:"Raffael-Eloi_roadmap-creation-assistance" /o:"raffael-eloi" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.opencover.reportPaths="**/coverage.opencover.xml"
+          dotnet build --no-incremental
+          dotnet test --no-build --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           ${{ runner.temp }}\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
 
