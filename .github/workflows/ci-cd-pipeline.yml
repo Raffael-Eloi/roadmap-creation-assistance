@@ -95,6 +95,8 @@ jobs:
             --name ${{ secrets.CONTAINER_APP_NAME }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --image ${{ vars.DOCKERHUB_USERNAME }}/roadmap-creation-assistance:${{ needs.pushImageToDockerHub.outputs.image-tag }} \
+            --cpu 0.5 \
+            --memory 1.0Gi \
             --replace-env-vars \
               DD_API_KEY=${{ secrets.DD_API_KEY }} \
               DD_SITE=us3.datadoghq.com \
