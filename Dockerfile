@@ -25,16 +25,14 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Install Datadog .NET tracer
+# Install Datadog serverless-init and .NET tracer
+COPY --from=datadog/serverless-init:1-alpine /datadog-init /app/datadog-init
 COPY --from=datadog/dd-lib-dotnet-init /datadog-init/monitoring-home/ /dd_tracer/dotnet/
 ENV DD_SERVICE=roadmap-creation-assistance
-ENV DD_DOTNET_TRACER_HOME=/dd_tracer/dotnet
-ENV CORECLR_ENABLE_PROFILING=1
-ENV CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
-ENV CORECLR_PROFILER_PATH=/dd_tracer/dotnet/linux-musl-x64/Datadog.Trace.ClrProfiler.Native.so
 
 # Health check (wget is available in Alpine by default, curl is not)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --spider --quiet http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["dotnet", "RoadmapCreationAssistance.API.dll"]
+ENTRYPOINT ["/app/datadog-init"]
+CMD ["dotnet", "RoadmapCreationAssistance.API.dll"]
