@@ -9,6 +9,7 @@ namespace RoadmapCreationAssistance.API.Controllers;
 public sealed class RoadMapGeneratorController(IRoadmapCreator roadmapCreator, ILogger<RoadMapGeneratorController> logger) : ControllerBase
 {
     [HttpGet("ping")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
     public IActionResult Ping()
     {
         logger.LogInformation("Ping endpoint hit at {Time}", DateTime.UtcNow);
@@ -17,6 +18,7 @@ public sealed class RoadMapGeneratorController(IRoadmapCreator roadmapCreator, I
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(RoadmapCreationResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GenerateRoadMap([FromBody] RoadmapCreationRequest request)
     {
         logger.LogInformation("Roadmap generation request received for repository {Owner}/{Repo}", request.GitHubOwner, request.GitHubRepositoryName);

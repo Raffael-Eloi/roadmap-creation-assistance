@@ -177,6 +177,8 @@ dotnet_diagnostic.SA1313.severity=none
 dotnet_diagnostic.S2325.severity=suggestion
 #elements should be separated by blank line (false positive with auto-generated implicit usings)
 dotnet_diagnostic.SA1516.severity=none
+#misleading indentation on braceless single-line if (conflicts with csharp_prefer_braces=when_multiline)
+dotnet_diagnostic.S2681.severity=none
 
 # Diagnostic severities - IDE rules (enforced during build via EnforceCodeStyleInBuild)
 #add braces

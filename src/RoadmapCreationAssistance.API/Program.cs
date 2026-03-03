@@ -31,8 +31,7 @@ builder.Host.UseSerilog((ctx, lc) =>
             ddApiKey,
             configuration: datadogConfig,
             service: Environment.GetEnvironmentVariable("DD_SERVICE") ?? "roadmap-creation-assistance-api",
-            host: Environment.MachineName
-        );
+            host: Environment.MachineName);
     }
 });
 
