@@ -10,611 +10,611 @@ namespace RoadmapCreationAssistance.API.Tests.UseCases;
 
 public class RoadmapCreatorShould
 {
-    private Mock<IMilestonesAIGenerator> milestonesAiGeneratorMock;
-    private Mock<IReadmeAIGenerator> readmeAiGeneratorMock;
-    private Mock<IGithubRepository> githubRepositoryMock;
-    private IRoadmapCreator roadmapCreator;
-    private RoadmapCreationRequest request;
-
-    [SetUp]
-    public void Setup()
-    {
-        milestonesAiGeneratorMock = new Mock<IMilestonesAIGenerator>();
-        readmeAiGeneratorMock = new Mock<IReadmeAIGenerator>();
-        githubRepositoryMock = new Mock<IGithubRepository>();
-        roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, readmeAiGeneratorMock.Object, githubRepositoryMock.Object);
-
-        request = new RoadmapCreationRequest
-        {
-            GitHubOwner = "John",
-            GitHubRepositoryName = "My repo",
-            GitHubToken = "MYTOKEN",
-            OpenAIKey = "MYOPENAIKEY",
-            ApiDomainDefinition = "MY API SPECS"
-        };
-    }
-
-    [Test]
-    public async Task Create_Labels_On_Github()
-    {
-        #region Arrange
-
-        #endregion
-
-        #region Act
-
-        await roadmapCreator.CreateAsync(request);
-
-        #endregion
-
-        #region Assert
-
-        Label expectedTechLabel = new()
-        {
-            Name = "TECH",
-            Description = "Technical implementation",
-            Color = "416BB8"
-        };
-
-        Label expectedMeLabel = new()
-        {
-            Name = "ME",
-            Description = "Mindset Evolution — Reflection and reasoning",
-            Color = "33D631"
-        };
-
-        Label expectedHandsOnLabel = new()
-        {
-            Name = "HO",
-            Description = "Hands-On — Small practical challenges",
-            Color = "FFE638"
-        };
-
-        githubRepositoryMock
-            .Verify(githubRepo =>
-                githubRepo.CreateLabels(It.Is<IEnumerable<Label>>(labelsToBeCreated =>
-                    labelsToBeCreated.Any(label => label.Name == expectedTechLabel.Name && label.Description == expectedTechLabel.Description && label.Color == expectedTechLabel.Color) &&
-                    labelsToBeCreated.Any(label => label.Name == expectedMeLabel.Name && label.Description == expectedMeLabel.Description && label.Color == expectedMeLabel.Color) &&
-                    labelsToBeCreated.Any(label => label.Name == expectedHandsOnLabel.Name && label.Description == expectedHandsOnLabel.Description && label.Color == expectedHandsOnLabel.Color)), request),
-            Times.Once);
-
-        #endregion
-    }
-
-    [Test]
-    public async Task Create_Milestones_On_Github()
-    {
-        #region Arrange
-
-        Milestone milestone1 = new()
-        {
-            Title = "My title 1",
-            Description = "My description 1",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 1"
-                },
-                new Issue()
-                {
-                    Title = "My issue 2 from milestone 1"
-                }
-            ]
-        };
-
-        Milestone milestone2 = new()
-        {
-            Title = "My title 2",
-            Description = "My description 2",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 2"
-                }
-            ]
-        };
-
-        List<Milestone> milestones = [milestone1, milestone2];
-
-        milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
-            .ReturnsAsync([milestone1, milestone2]);
+	private Mock<IMilestonesAIGenerator> milestonesAiGeneratorMock;
+	private Mock<IReadmeAIGenerator> readmeAiGeneratorMock;
+	private Mock<IGithubRepository> githubRepositoryMock;
+	private IRoadmapCreator roadmapCreator;
+	private RoadmapCreationRequest request;
+
+	[SetUp]
+	public void Setup()
+	{
+		milestonesAiGeneratorMock = new Mock<IMilestonesAIGenerator>();
+		readmeAiGeneratorMock = new Mock<IReadmeAIGenerator>();
+		githubRepositoryMock = new Mock<IGithubRepository>();
+		roadmapCreator = new RoadmapCreator(milestonesAiGeneratorMock.Object, readmeAiGeneratorMock.Object, githubRepositoryMock.Object);
+
+		request = new RoadmapCreationRequest
+		{
+			GitHubOwner = "John",
+			GitHubRepositoryName = "My repo",
+			GitHubToken = "MYTOKEN",
+			OpenAIKey = "MYOPENAIKEY",
+			ApiDomainDefinition = "MY API SPECS"
+		};
+	}
+
+	[Test]
+	public async Task Create_Labels_On_Github()
+	{
+		#region Arrange
+
+		#endregion
+
+		#region Act
+
+		await roadmapCreator.CreateAsync(request);
+
+		#endregion
+
+		#region Assert
+
+		Label expectedTechLabel = new()
+		{
+			Name = "TECH",
+			Description = "Technical implementation",
+			Color = "416BB8"
+		};
+
+		Label expectedMeLabel = new()
+		{
+			Name = "ME",
+			Description = "Mindset Evolution — Reflection and reasoning",
+			Color = "33D631"
+		};
+
+		Label expectedHandsOnLabel = new()
+		{
+			Name = "HO",
+			Description = "Hands-On — Small practical challenges",
+			Color = "FFE638"
+		};
+
+		githubRepositoryMock
+			.Verify(githubRepo =>
+				githubRepo.CreateLabels(It.Is<IEnumerable<Label>>(labelsToBeCreated =>
+					labelsToBeCreated.Any(label => label.Name == expectedTechLabel.Name && label.Description == expectedTechLabel.Description && label.Color == expectedTechLabel.Color) &&
+					labelsToBeCreated.Any(label => label.Name == expectedMeLabel.Name && label.Description == expectedMeLabel.Description && label.Color == expectedMeLabel.Color) &&
+					labelsToBeCreated.Any(label => label.Name == expectedHandsOnLabel.Name && label.Description == expectedHandsOnLabel.Description && label.Color == expectedHandsOnLabel.Color)), request),
+			Times.Once);
+
+		#endregion
+	}
+
+	[Test]
+	public async Task Create_Milestones_On_Github()
+	{
+		#region Arrange
+
+		Milestone milestone1 = new()
+		{
+			Title = "My title 1",
+			Description = "My description 1",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 1"
+				},
+				new Issue()
+				{
+					Title = "My issue 2 from milestone 1"
+				}
+			]
+		};
+
+		Milestone milestone2 = new()
+		{
+			Title = "My title 2",
+			Description = "My description 2",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 2"
+				}
+			]
+		};
+
+		List<Milestone> milestones = [milestone1, milestone2];
+
+		milestonesAiGeneratorMock
+			.Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+			.ReturnsAsync([milestone1, milestone2]);
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        await roadmapCreator.CreateAsync(request);
+		await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        githubRepositoryMock
-            .Verify(githubRepo => githubRepo.CreateMilestones(milestones, request),
-            Times.Once);
+		githubRepositoryMock
+			.Verify(githubRepo => githubRepo.CreateMilestones(milestones, request),
+			Times.Once);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Create_Issues_On_Github()
-    {
-        #region Arrange
+	[Test]
+	public async Task Create_Issues_On_Github()
+	{
+		#region Arrange
 
-        Milestone milestone1 = new()
-        {
-            Title = "My title 1",
-            Description = "My description 1",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 1"
-                },
-                new Issue()
-                {
-                    Title = "My issue 2 from milestone 1"
-                }
-            ]
-        };
-
-        Milestone milestone2 = new()
-        {
-            Title = "My title 2",
-            Description = "My description 2",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 2"
-                }
-            ]
-        };
-
-        List<Milestone> milestones = [milestone1, milestone2];
-
-        int milestone1Id = 1010;
-
-        int milestone2Id = 2020;
-
-        milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
-            .Callback(() =>
-            {
-                milestone1.Id = milestone1Id;
-                milestone2.Id = milestone2Id;
-            })
-            .ReturnsAsync([milestone1, milestone2]);
-
-        #endregion
-
-        #region Act
-
-        await roadmapCreator.CreateAsync(request);
-
-        #endregion
-
-        #region Assert
-
-        githubRepositoryMock
-            .Verify(githubRepo => 
-                githubRepo.CreateIssues(It.Is<IEnumerable<Issue>>(issuesToBeCreated => 
-                    issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.First().Title && issue.Milestone == milestone1Id && issue.Assignee == request.GitHubOwner) &&
-                    issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.Last().Title && issue.Milestone == milestone1Id && issue.Assignee == request.GitHubOwner) &&
-                    issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id && issue.Assignee == request.GitHubOwner)), request),
-            Times.Once);
-
-        #endregion
-    }
+		Milestone milestone1 = new()
+		{
+			Title = "My title 1",
+			Description = "My description 1",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 1"
+				},
+				new Issue()
+				{
+					Title = "My issue 2 from milestone 1"
+				}
+			]
+		};
+
+		Milestone milestone2 = new()
+		{
+			Title = "My title 2",
+			Description = "My description 2",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 2"
+				}
+			]
+		};
+
+		List<Milestone> milestones = [milestone1, milestone2];
+
+		int milestone1Id = 1010;
+
+		int milestone2Id = 2020;
+
+		milestonesAiGeneratorMock
+			.Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+			.Callback(() => 
+			{
+				milestone1.Id = milestone1Id;
+				milestone2.Id = milestone2Id;
+			})
+			.ReturnsAsync([milestone1, milestone2]);
+
+		#endregion
+
+		#region Act
+
+		await roadmapCreator.CreateAsync(request);
+
+		#endregion
+
+		#region Assert
+
+		githubRepositoryMock
+			.Verify(githubRepo =>
+				githubRepo.CreateIssues(It.Is<IEnumerable<Issue>>(issuesToBeCreated =>
+					issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.First().Title && issue.Milestone == milestone1Id && issue.Assignee == request.GitHubOwner) &&
+					issuesToBeCreated.Any(issue => issue.Title == milestone1.Issues.Last().Title && issue.Milestone == milestone1Id && issue.Assignee == request.GitHubOwner) &&
+					issuesToBeCreated.Any(issue => issue.Title == milestone2.Issues.First().Title && issue.Milestone == milestone2Id && issue.Assignee == request.GitHubOwner)), request),
+			Times.Once);
+
+		#endregion
+	}
 
-    [Test]
-    public async Task Create_A_Project_On_Github()
-    {
-        #region Arrange
+	[Test]
+	public async Task Create_A_Project_On_Github()
+	{
+		#region Arrange
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        await roadmapCreator.CreateAsync(request);
+		await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        string expectedTitle = "Roadmap - Software Engineer";
+		string expectedTitle = "Roadmap - Software Engineer";
 
-        githubRepositoryMock
-            .Verify(githubRepo => 
-                githubRepo.CreateProject(It.Is<Project>(project => project.Title == expectedTitle), request),
-            Times.Once);
+		githubRepositoryMock
+			.Verify(githubRepo =>
+				githubRepo.CreateProject(It.Is<Project>(project => project.Title == expectedTitle), request),
+			Times.Once);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Link_Issues_To_The_Project_On_Github()
-    {
-        #region Arrange
+	[Test]
+	public async Task Link_Issues_To_The_Project_On_Github()
+	{
+		#region Arrange
 
-        Milestone milestone = new()
-        {
-            Title = "My title 1",
-            Description = "My description 1",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 1"
-                },
-                new Issue()
-                {
-                    Title = "My issue 2 from milestone 1"
-                }
-            ]
-        };
+		Milestone milestone = new()
+		{
+			Title = "My title 1",
+			Description = "My description 1",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 1"
+				},
+				new Issue()
+				{
+					Title = "My issue 2 from milestone 1"
+				}
+			]
+		};
 
-        milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
-            .ReturnsAsync([milestone]);
+		milestonesAiGeneratorMock
+			.Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+			.ReturnsAsync([milestone]);
 
-        milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
-            .Callback(() =>
-            {
-                milestone.Id = 1010;
-            })
-            .ReturnsAsync([milestone]);
+		milestonesAiGeneratorMock
+			.Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+			.Callback(() => 
+			{
+				milestone.Id = 1010;
+			})
+			.ReturnsAsync([milestone]);
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        await roadmapCreator.CreateAsync(request);
+		await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        string expectedTitle = "Roadmap - Software Engineer";
+		string expectedTitle = "Roadmap - Software Engineer";
 
-        githubRepositoryMock
-            .Verify(githubRepo => 
-                githubRepo.LinkIssuesToProject(
-                    It.Is<Project>(project => project.Title == expectedTitle),
-                    It.Is<IEnumerable<Issue>>(issues => 
-                        issues.Any(issue => issue.Title == milestone.Issues.First().Title) && 
-                        issues.Any(issue => issue.Title == milestone.Issues.Last().Title)),
-                    request),
-            Times.Once);
+		githubRepositoryMock
+			.Verify(githubRepo =>
+				githubRepo.LinkIssuesToProject(
+					It.Is<Project>(project => project.Title == expectedTitle),
+					It.Is<IEnumerable<Issue>>(issues =>
+						issues.Any(issue => issue.Title == milestone.Issues.First().Title) &&
+						issues.Any(issue => issue.Title == milestone.Issues.Last().Title)),
+					request),
+			Times.Once);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Create_Readme_On_Github()
-    {
-        #region Arrange
+	[Test]
+	public async Task Create_Readme_On_Github()
+	{
+		#region Arrange
 
-        string readme = "# Roadmap\n\nThis is a sample roadmap.";
+		string readme = "# Roadmap\n\nThis is a sample roadmap.";
 
-        readmeAiGeneratorMock
-            .Setup(readmeGenerator => readmeGenerator.GenerateAsync(request))
-            .ReturnsAsync(readme);
+		readmeAiGeneratorMock
+			.Setup(readmeGenerator => readmeGenerator.GenerateAsync(request))
+			.ReturnsAsync(readme);
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        await roadmapCreator.CreateAsync(request);
+		await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        githubRepositoryMock
-            .Verify(githubRepo => githubRepo.CreateReadme(readme, request),
-            Times.Once);
+		githubRepositoryMock
+			.Verify(githubRepo => githubRepo.CreateReadme(readme, request),
+			Times.Once);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_Milestones_Generation_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_Milestones_Generation_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Failed to deserialize milestones from AI response.";
+		string expectedMessage = "Failed to deserialize milestones from AI response.";
 
-        milestonesAiGeneratorMock
-            .Setup(generator => generator.GenerateWithIssues(request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		milestonesAiGeneratorMock
+			.Setup(generator => generator.GenerateWithIssues(request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_HttpRequestException_When_OpenAI_Request_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_HttpRequestException_When_OpenAI_Request_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Error occurred while sending request to OpenAI API.";
+		string expectedMessage = "Error occurred while sending request to OpenAI API.";
 
-        milestonesAiGeneratorMock
-            .Setup(generator => generator.GenerateWithIssues(request))
-            .ThrowsAsync(new HttpRequestException(expectedMessage));
+		milestonesAiGeneratorMock
+			.Setup(generator => generator.GenerateWithIssues(request))
+			.ThrowsAsync(new HttpRequestException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<HttpRequestException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<HttpRequestException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_Labels_Creation_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_Labels_Creation_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Failed to create labels on GitHub.";
+		string expectedMessage = "Failed to create labels on GitHub.";
 
-        githubRepositoryMock
-            .Setup(repo => repo.CreateLabels(It.IsAny<IEnumerable<Label>>(), request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		githubRepositoryMock
+			.Setup(repo => repo.CreateLabels(It.IsAny<IEnumerable<Label>>(), request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_Milestones_Creation_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_Milestones_Creation_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Failed to create milestone 'Test Milestone'. Status code: BadRequest";
+		string expectedMessage = "Failed to create milestone 'Test Milestone'. Status code: BadRequest";
 
-        milestonesAiGeneratorMock
-            .Setup(generator => generator.GenerateWithIssues(request))
-            .ReturnsAsync([new Milestone { Title = "Test Milestone", Description = "Test", Issues = [] }]);
+		milestonesAiGeneratorMock
+			.Setup(generator => generator.GenerateWithIssues(request))
+			.ReturnsAsync([new Milestone { Title = "Test Milestone", Description = "Test", Issues = [] }]);
 
-        githubRepositoryMock
-            .Setup(repo => repo.CreateMilestones(It.IsAny<IEnumerable<Milestone>>(), request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		githubRepositoryMock
+			.Setup(repo => repo.CreateMilestones(It.IsAny<IEnumerable<Milestone>>(), request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_Project_Creation_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_Project_Creation_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Could not create project on GitHub";
+		string expectedMessage = "Could not create project on GitHub";
 
-        githubRepositoryMock
-            .Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		githubRepositoryMock
+			.Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_User_Id_Retrieval_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_User_Id_Retrieval_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Could not retrieve user ID from GitHub";
+		string expectedMessage = "Could not retrieve user ID from GitHub";
 
-        githubRepositoryMock
-            .Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		githubRepositoryMock
+			.Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_Repository_Id_Retrieval_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_Repository_Id_Retrieval_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "Could not retrieve repository ID from GitHub";
+		string expectedMessage = "Could not retrieve repository ID from GitHub";
 
-        githubRepositoryMock
-            .Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		githubRepositoryMock
+			.Setup(repo => repo.CreateProject(It.IsAny<Project>(), request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Propagate_InvalidOperationException_When_Readme_Generation_Fails()
-    {
-        #region Arrange
+	[Test]
+	public async Task Propagate_InvalidOperationException_When_Readme_Generation_Fails()
+	{
+		#region Arrange
 
-        string expectedMessage = "No valid output found in OpenAI response.";
+		string expectedMessage = "No valid output found in OpenAI response.";
 
-        readmeAiGeneratorMock
-            .Setup(generator => generator.GenerateAsync(request))
-            .ThrowsAsync(new InvalidOperationException(expectedMessage));
+		readmeAiGeneratorMock
+			.Setup(generator => generator.GenerateAsync(request))
+			.ThrowsAsync(new InvalidOperationException(expectedMessage));
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
+		Func<Task> act = async () => await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        await act.Should()
-            .ThrowAsync<InvalidOperationException>()
-            .WithMessage(expectedMessage);
+		await act.Should()
+			.ThrowAsync<InvalidOperationException>()
+			.WithMessage(expectedMessage);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Return_Roadmap_Creation_Response()
-    {
-        #region Arrange
+	[Test]
+	public async Task Return_Roadmap_Creation_Response()
+	{
+		#region Arrange
 
-        Milestone milestone1 = new()
-        {
-            Title = "My title 1",
-            Description = "My description 1",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 1"
-                },
-                new Issue()
-                {
-                    Title = "My issue 2 from milestone 1"
-                }
-            ]
-        };
+		Milestone milestone1 = new()
+		{
+			Title = "My title 1",
+			Description = "My description 1",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 1"
+				},
+				new Issue()
+				{
+					Title = "My issue 2 from milestone 1"
+				}
+			]
+		};
 
-        Milestone milestone2 = new()
-        {
-            Title = "My title 2",
-            Description = "My description 2",
-            Issues =
-            [
-                new Issue()
-                {
-                    Title = "My issue 1 from milestone 2"
-                }
-            ]
-        };
+		Milestone milestone2 = new()
+		{
+			Title = "My title 2",
+			Description = "My description 2",
+			Issues =
+			[
+				new Issue()
+				{
+					Title = "My issue 1 from milestone 2"
+				}
+			]
+		};
 
-        List<Milestone> milestones = [milestone1, milestone2];
+		List<Milestone> milestones = [milestone1, milestone2];
 
-        milestonesAiGeneratorMock
-            .Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
-            .ReturnsAsync([milestone1, milestone2]);
+		milestonesAiGeneratorMock
+			.Setup(milestonesGenerator => milestonesGenerator.GenerateWithIssues(request))
+			.ReturnsAsync([milestone1, milestone2]);
 
-        string projectId = "123456";
+		string projectId = "123456";
 
-        githubRepositoryMock
-            .Setup(githubRepo => githubRepo.CreateProject(It.IsAny<Project>(), request))
-            .Callback<Project, RoadmapCreationRequest>((project, req) =>
-            {
-                project.Id = projectId;
-            });
+		githubRepositoryMock
+			.Setup(githubRepo => githubRepo.CreateProject(It.IsAny<Project>(), request))
+			.Callback<Project, RoadmapCreationRequest>((project, req) => 
+			{
+				project.Id = projectId;
+			});
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        RoadmapCreationResponse response = await roadmapCreator.CreateAsync(request);
+		RoadmapCreationResponse response = await roadmapCreator.CreateAsync(request);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        response.ProjectId.Should().Be(projectId);
-        response.MilestonesCreatedCount.Should().Be(2);
-        response.IssuesCreatedCount.Should().Be(3);
-        response.ReadmeCreated.Should().BeTrue();
+		response.ProjectId.Should().Be(projectId);
+		response.MilestonesCreatedCount.Should().Be(2);
+		response.IssuesCreatedCount.Should().Be(3);
+		response.ReadmeCreated.Should().BeTrue();
 
-        #endregion
-    }
+		#endregion
+	}
 }

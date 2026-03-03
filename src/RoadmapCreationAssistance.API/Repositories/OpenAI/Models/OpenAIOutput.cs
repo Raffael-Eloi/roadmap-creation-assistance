@@ -1,5 +1,4 @@
-﻿
-namespace RoadmapCreationAssistance.API.Repositories.OpenAI.Models;
+﻿namespace RoadmapCreationAssistance.API.Repositories.OpenAI.Models;
 
 internal sealed class OpenAIOutput
 {

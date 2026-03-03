@@ -1,6 +1,6 @@
-﻿using RoadmapCreationAssistance.API.JsonSerialization;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+using RoadmapCreationAssistance.API.JsonSerialization;
 
 namespace RoadmapCreationAssistance.API.Extensions;
 
@@ -12,8 +12,6 @@ public static class HttpContentExtensions
         return new StringContent(json, Encoding.UTF8, "application/json");
     }
 
-    public static HttpContent ToJsonContent(this string input)
-    {
-        return new StringContent(input, Encoding.UTF8, "application/json");
-    }
+    public static HttpContent ToJsonContent(this string input) =>
+        new StringContent(input, Encoding.UTF8, "application/json");
 }

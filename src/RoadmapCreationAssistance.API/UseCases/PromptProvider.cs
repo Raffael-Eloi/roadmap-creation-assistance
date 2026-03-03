@@ -7,7 +7,7 @@ namespace RoadmapCreationAssistance.API.UseCases
         public async Task<string> GetMilestoneInstructionAsync(string language, string apiDomainDefinition)
         {
             string prompt = await GetRoadmapBaseAsync(language, apiDomainDefinition);
-            
+
             string currentDirectory = Directory.GetCurrentDirectory();
             string milestonesGenerationPromptPath = Path.Combine(currentDirectory, "PromptBase", "milestones_generation_instruction.md");
             string milestonesGenerationPrompt = await File.ReadAllTextAsync(milestonesGenerationPromptPath);

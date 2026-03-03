@@ -99,14 +99,12 @@ public class RoadmapCreator(IMilestonesAIGenerator milestonesAIGenerator, IReadm
         await githubRepository.CreateReadme(readme, request);
     }
 
-    private static RoadmapCreationResponse SuccessfulResponse(IEnumerable<Milestone> milestones, IEnumerable<Issue> issues, Project project)
-    {
-        return new RoadmapCreationResponse
+    private static RoadmapCreationResponse SuccessfulResponse(IEnumerable<Milestone> milestones, IEnumerable<Issue> issues, Project project) =>
+        new RoadmapCreationResponse
         {
             ProjectId = project.Id!,
             MilestonesCreatedCount = milestones.Count(),
             IssuesCreatedCount = issues.Count(),
             ReadmeCreated = true
         };
-    }
 }

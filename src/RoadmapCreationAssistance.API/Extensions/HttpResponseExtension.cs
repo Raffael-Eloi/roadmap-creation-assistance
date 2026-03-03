@@ -1,5 +1,5 @@
-﻿using RoadmapCreationAssistance.API.JsonSerialization;
-using System.Text.Json;
+﻿using System.Text.Json;
+using RoadmapCreationAssistance.API.JsonSerialization;
 
 namespace RoadmapCreationAssistance.API.Extensions;
 
@@ -8,8 +8,7 @@ public static class HttpResponseExtension
     public static async Task<T> DeserializeAsync<T>(this HttpResponseMessage httpResponse)
     {
         if (!httpResponse.IsSuccessStatusCode)
-            throw new HttpRequestException(
-                $"HTTP request failed with status code {(int)httpResponse.StatusCode} ({httpResponse.StatusCode}).");
+			throw new HttpRequestException($"HTTP request failed with status code {(int)httpResponse.StatusCode} ({httpResponse.StatusCode}).");
 
         string responseJson = await httpResponse.Content.ReadAsStringAsync();
         T? response = JsonSerializer.Deserialize<T>(responseJson, JsonSerializationOptions.Default);

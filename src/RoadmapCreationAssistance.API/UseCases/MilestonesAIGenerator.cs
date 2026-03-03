@@ -1,9 +1,9 @@
-﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
+﻿using System.Text.Json;
+using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Entities;
 using RoadmapCreationAssistance.API.JsonSerialization;
 using RoadmapCreationAssistance.API.Models;
-using System.Text.Json;
 
 namespace RoadmapCreationAssistance.API.UseCases;
 

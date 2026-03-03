@@ -1,10 +1,9 @@
-﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
+using System.Net.Http.Headers;
+using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Entities;
 using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.Models;
 using RoadmapCreationAssistance.API.Repositories.Github.Models;
-using Serilog.Core;
-using System.Net.Http.Headers;
 
 namespace RoadmapCreationAssistance.API.Repositories.Github;
 
@@ -24,14 +23,6 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
             await httpClient.PostAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/labels", labelContent);
             logger.LogInformation("Created label '{LabelName}' for repository {Owner}/{Repo}", label.Name, request.GitHubOwner, request.GitHubRepositoryName);
         }
-    }
-
-    private HttpClient CreateHttpClient(RoadmapCreationRequest request)
-    {
-        HttpClient httpClient = httpClientFactory.CreateClient(HttpClientName);
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.GitHubToken);
-        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
-        return httpClient;
     }
 
     public async Task CreateMilestones(IEnumerable<Milestone> milestones, RoadmapCreationRequest request)
@@ -59,7 +50,6 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
             milestone.Id = milestoneResponse.Number!.Value;
         }
     }
-
 
     public async Task CreateIssues(IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {
@@ -93,17 +83,14 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
     public async Task LinkIssuesToProject(Project project, IEnumerable<Issue> issues, RoadmapCreationRequest request)
     {
         logger.LogInformation("Linking issues to project '{ProjectTitle}' for repository {Owner}/{Repo}", project.Title, request.GitHubOwner, request.GitHubRepositoryName);
-        foreach (Issue issue in issues)
+        foreach (Issue issue in issues.Where(issue => issue.Number.HasValue))
         {
-            if (!issue.Number.HasValue)
-                continue;
-
             try
             {
                 string issueNodeId = await graphQLClient.GetIssueNodeIdAsync(
                     request.GitHubOwner,
                     request.GitHubRepositoryName,
-                    issue.Number.Value,
+                    issue.Number!.Value,
                     request.GitHubToken);
 
                 await graphQLClient.AddItemToProjectAsync(project.Id!, issueNodeId, request.GitHubToken);
@@ -128,5 +115,13 @@ public class GithubRepository(IHttpClientFactory httpClientFactory, IGitHubGraph
         };
 
         await httpClient.PutAsync($"/repos/{request.GitHubOwner}/{request.GitHubRepositoryName}/contents/README.md", content.ToJsonContent());
+    }
+
+    private HttpClient CreateHttpClient(RoadmapCreationRequest request)
+    {
+        HttpClient httpClient = httpClientFactory.CreateClient(HttpClientName);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", request.GitHubToken);
+        httpClient.DefaultRequestHeaders.Add("User-Agent", request.GitHubOwner);
+        return httpClient;
     }
 }

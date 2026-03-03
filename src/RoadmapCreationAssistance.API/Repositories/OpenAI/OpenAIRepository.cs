@@ -1,7 +1,7 @@
-﻿using RoadmapCreationAssistance.API.Contracts.Repositories;
+﻿using System.Net.Http.Headers;
+using RoadmapCreationAssistance.API.Contracts.Repositories;
 using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.Repositories.OpenAI.Models;
-using System.Net.Http.Headers;
 
 namespace RoadmapCreationAssistance.API.Repositories.OpenAI;
 

@@ -8,28 +8,25 @@ public sealed class Label
 
     public string? Color { get; set; }
 
-    public static IEnumerable<Label> GenerateDefaultLabels()
-    {
-        return
-        [
-            new Label()
-            {
-                Name = "TECH",
-                Description = "Technical implementation",
-                Color = "416BB8"
-            },
-            new Label()
-            {
-                Name = "ME",
-                Description = "Mindset Evolution — Reflection and reasoning",
-                Color = "33D631"
-            },
-            new Label()
-            {
-                Name = "HO",
-                Description = "Hands-On — Small practical challenges",
-                Color = "FFE638"
-            },
-        ];
-    }
+    public static IEnumerable<Label> GenerateDefaultLabels() =>
+    [
+        new Label()
+        {
+            Name = "TECH",
+            Description = "Technical implementation",
+            Color = "416BB8"
+        },
+        new Label()
+        {
+            Name = "ME",
+            Description = "Mindset Evolution — Reflection and reasoning",
+            Color = "33D631"
+        },
+        new Label()
+        {
+            Name = "HO",
+            Description = "Hands-On — Small practical challenges",
+            Color = "FFE638"
+        },
+    ];
 }

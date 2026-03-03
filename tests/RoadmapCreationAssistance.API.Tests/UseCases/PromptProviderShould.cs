@@ -7,80 +7,78 @@ namespace RoadmapCreationAssistance.API.Tests.UseCases;
 
 internal class PromptProviderShould
 {
-    private IPromptProvider promptProvider;
+	private IPromptProvider promptProvider;
 
-    [SetUp]
-    public void Setup()
-    {
-        promptProvider = new PromptProvider();
-    }
+	[SetUp]
+	public void Setup() =>
+		promptProvider = new PromptProvider();
 
-    [Test]
-    public async Task Get_Prompt_Base()
-    {
-        #region Arrange
+	[Test]
+	public async Task Get_Prompt_Base()
+	{
+		#region Arrange
 
-        string language = "Portuguese-BR";
+		string language = "Portuguese-BR";
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        string result = await promptProvider.GetRoadmapBaseAsync(language, string.Empty);
+		string result = await promptProvider.GetRoadmapBaseAsync(language, string.Empty);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        result.Should().Contain($"📌 Prompt: Software Engineering Confidence Roadmap");
-        result.Should().Contain($"All documentation, milestones, issues and code must be written **in {language}**");
+		result.Should().Contain($"📌 Prompt: Software Engineering Confidence Roadmap");
+		result.Should().Contain($"All documentation, milestones, issues and code must be written **in {language}**");
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Get_Prompt_Base_With_Domain_Definition()
-    {
-        #region Arrange
+	[Test]
+	public async Task Get_Prompt_Base_With_Domain_Definition()
+	{
+		#region Arrange
 
-        string domainDefinition = "CRUD of Car Managament";
-        #endregion
+		string domainDefinition = "CRUD of Car Managament";
+		#endregion
 
-        #region Act
+		#region Act
 
-        string result = await promptProvider.GetRoadmapBaseAsync("English-US", domainDefinition);
+		string result = await promptProvider.GetRoadmapBaseAsync("English-US", domainDefinition);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        result.Should().Contain($"The context is {domainDefinition}");
-        result.Should().Contain(domainDefinition);
+		result.Should().Contain($"The context is {domainDefinition}");
+		result.Should().Contain(domainDefinition);
 
-        #endregion
-    }
+		#endregion
+	}
 
-    [Test]
-    public async Task Get_Milestone_Instructions()
-    {
-        #region Arrange
+	[Test]
+	public async Task Get_Milestone_Instructions()
+	{
+		#region Arrange
 
-        string language = "Portuguese-BR";
+		string language = "Portuguese-BR";
 
-        #endregion
+		#endregion
 
-        #region Act
+		#region Act
 
-        string result = await promptProvider.GetMilestoneInstructionAsync(language, string.Empty);
+		string result = await promptProvider.GetMilestoneInstructionAsync(language, string.Empty);
 
-        #endregion
+		#endregion
 
-        #region Assert
+		#region Assert
 
-        result.Should().Contain($"📌 Prompt: Software Engineering Confidence Roadmap");
-        result.Should().Contain($"Given this prompt, I want you to generate milestones with issues");
-        result.Should().Contain($"All documentation, milestones, issues and code must be written **in {language}**");
+		result.Should().Contain($"📌 Prompt: Software Engineering Confidence Roadmap");
+		result.Should().Contain($"Given this prompt, I want you to generate milestones with issues");
+		result.Should().Contain($"All documentation, milestones, issues and code must be written **in {language}**");
 
-        #endregion
-    }
+		#endregion
+	}
 }

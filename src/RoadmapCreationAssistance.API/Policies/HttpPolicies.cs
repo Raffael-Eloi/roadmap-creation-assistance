@@ -1,14 +1,13 @@
+using System.Net;
 using Polly;
 using Polly.Extensions.Http;
-using System.Net;
 
 namespace RoadmapCreationAssistance.API.Policies;
 
 public class HttpPolicies(ILogger<HttpPolicies> logger)
 {
-    public IAsyncPolicy<HttpResponseMessage> GetGitHubRetryPolicy()
-    {
-        return HttpPolicyExtensions
+    public IAsyncPolicy<HttpResponseMessage> GetGitHubRetryPolicy() =>
+        HttpPolicyExtensions
             .HandleTransientHttpError()
             .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests)
             .WaitAndRetryAsync(
@@ -31,11 +30,9 @@ public class HttpPolicies(ILogger<HttpPolicies> logger)
                         outcome.Exception?.Message ?? outcome.Result?.StatusCode.ToString());
                     return Task.CompletedTask;
                 });
-    }
 
-    public IAsyncPolicy<HttpResponseMessage> GetOpenAIRetryPolicy()
-    {
-        return HttpPolicyExtensions
+    public IAsyncPolicy<HttpResponseMessage> GetOpenAIRetryPolicy() =>
+        HttpPolicyExtensions
             .HandleTransientHttpError()
             .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests)
             .WaitAndRetryAsync(
@@ -58,5 +55,4 @@ public class HttpPolicies(ILogger<HttpPolicies> logger)
                         outcome.Exception?.Message ?? outcome.Result?.StatusCode.ToString());
                     return Task.CompletedTask;
                 });
-    }
 }

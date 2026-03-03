@@ -9,7 +9,7 @@ using RoadmapCreationAssistance.API.UseCases;
 using Serilog;
 using Serilog.Sinks.Datadog.Logs;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((ctx, lc) =>
 {
@@ -20,7 +20,7 @@ builder.Host.UseSerilog((ctx, lc) =>
 
     if (!string.IsNullOrWhiteSpace(ddApiKey))
     {
-        var datadogConfig = new DatadogConfiguration
+        DatadogConfiguration datadogConfig = new DatadogConfiguration
         {
             Url = "intake.logs.us3.datadoghq.com",
             Port = 10516,
@@ -81,7 +81,7 @@ builder.Services.AddHealthChecks()
     .AddUrlGroup(new Uri(builder.Configuration["GitHubApi:HealthCheckUrl"]!), "github")
     .AddUrlGroup(new Uri(builder.Configuration["OpenAIApi:HealthCheckUrl"]!), "openai");
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -99,4 +99,4 @@ app.MapControllers();
 
 app.MapHealthChecks("/health");
 
-app.Run();
+await app.RunAsync();
