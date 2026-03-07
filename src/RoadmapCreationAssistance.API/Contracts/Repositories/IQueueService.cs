@@ -2,7 +2,7 @@
 
 namespace RoadmapCreationAssistance.API.Contracts.Repositories;
 
-public interface IDatabaseRepository
+public interface IQueueService
 {
-	Task Save(AsyncTaskRequest asyncTask);
+	Task Send(SendMessage sendMessage);
 }
