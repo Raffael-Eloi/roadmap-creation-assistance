@@ -1,0 +1,35 @@
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    ports:
+      - "10000:10000"  # Blob storage
+      - "10001:10001"  # Queue storage
+      - "10002:10002"  # Table storage
+    volumes:
+      - azurite_data:/data
+    command: azurite --loose --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    
+  roadmapcreationassistance.api:
+    image: ${DOCKER_REGISTRY-}roadmapcreationassistanceapi
+    build:
+      context: .
+      dockerfile: src/RoadmapCreationAssistance.API/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - azurite
+    entrypoint: ["dotnet", "RoadmapCreationAssistance.API.dll"]
+    command: []
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CORECLR_ENABLE_PROFILING=0
+      - AzureStorage__ConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+    networks:
+      - app_network
+
+volumes:
+  azurite_data:
+
+networks:
+  app_network:
+    driver: bridge
