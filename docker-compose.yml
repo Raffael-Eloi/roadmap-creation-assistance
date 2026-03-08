@@ -8,6 +8,8 @@ services:
     volumes:
       - azurite_data:/data
     command: azurite --loose --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    networks:
+      - app_network
     
   roadmapcreationassistance.api:
     image: ${DOCKER_REGISTRY-}roadmapcreationassistanceapi

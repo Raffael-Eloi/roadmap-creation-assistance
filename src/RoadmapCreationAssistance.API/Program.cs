@@ -1,10 +1,12 @@
 using RoadmapCreationAssistance.API.Contracts.Repositories;
+using RoadmapCreationAssistance.API.Contracts.Services;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Middlewares;
 using RoadmapCreationAssistance.API.Policies;
 using RoadmapCreationAssistance.API.Repositories.Github;
 using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
+using RoadmapCreationAssistance.API.Services;
 using RoadmapCreationAssistance.API.UseCases;
 using Serilog;
 using Serilog.Sinks.Datadog.Logs;
@@ -36,6 +38,16 @@ builder.Host.UseSerilog((ctx, lc) =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -73,6 +85,13 @@ builder.Services.AddHttpClient(GitHubGraphQLClient.HttpClientName, client =>
     return policies.GetGitHubRetryPolicy();
 });
 
+builder.Services.AddScoped<IQueueService>(sp =>
+{
+    string connectionString = builder.Configuration["AzureStorage:ConnectionString"]!;
+    ILogger<QueueServices> logger = sp.GetRequiredService<ILogger<QueueServices>>();
+    return new QueueServices(logger, connectionString);
+});
+
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
 builder.Services.AddScoped<IOpenAIRepository, OpenAIRepository>();
@@ -94,6 +113,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.UseHttpsRedirection();
 }
+
+app.UseCors("AllowAll");
 
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
