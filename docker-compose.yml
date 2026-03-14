@@ -29,6 +29,20 @@ services:
     networks:
       - app_network
 
+  roadmapcreationassistance.functions:
+    build:
+      context: .    
+      dockerfile: "src/RoadmapCreationAssistance.Functions/Dockerfile"
+    ports:
+      - "7071:7071"
+    depends_on:
+      - azurite
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AzureStorage__ConnectionString=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+    networks:
+      - app_network
+      
 volumes:
   azurite_data:
 

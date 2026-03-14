@@ -9,5 +9,6 @@
     <Build />
   </Project>
   <Project Path="src/RoadmapCreationAssistance.API/RoadmapCreationAssistance.API.csproj" Id="e964bbcb-c13c-42d1-83d3-f61ee1f10772" />
+  <Project Path="src/RoadmapCreationAssistance.Functions/RoadmapCreationAssistance.Functions.csproj" Id="64fac575-2722-4507-912f-70c208628fda" />
   <Project Path="tests/RoadmapCreationAssistance.API.Tests/RoadmapCreationAssistance.API.Tests.csproj" Id="97f00470-9f3e-42e8-965d-671d9d50e851" />
 </Solution>
