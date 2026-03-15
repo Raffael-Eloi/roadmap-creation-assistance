@@ -17,9 +17,16 @@ public class CreateRoadmap(IDatabaseRepository databaseRepository, IQueueService
 
 		await databaseRepository.Save(asyncTask);
 
-		string content = JsonSerializer.Serialize(request);
-
-		await enqueueService.SendAsync(new QueueMessage(queueName, content));
+		try
+		{
+			string content = JsonSerializer.Serialize(request);
+			await enqueueService.SendAsync(new QueueMessage(queueName, content));
+		}
+		catch (Exception ex)
+		{
+			await databaseRepository.UpdateStatus(jobId.ToString(), AsyncTaskStatus.Error, new List<string> { ex.Message });
+			throw;
+		}
 
 		return new CreateRoadmapResponse(jobId.ToString());
 	}

@@ -20,4 +20,20 @@ public class DatabaseRepository(ILogger<DatabaseRepository> logger) : IDatabaseR
 			logger.LogError(ex, "Error saving async task with ID: {TaskId}", asyncTask.JobId);
 		}
 	}
+
+	public async Task UpdateStatus(string jobId, AsyncTaskStatus status, List<string>? errors = null)
+	{
+		try
+		{
+			logger.LogInformation("Updating async task {TaskId} status to {Status}", jobId, status);
+
+			await Task.CompletedTask;
+
+			logger.LogInformation("Async task {TaskId} status updated to {Status}", jobId, status);
+		}
+		catch (Exception ex)
+		{
+			logger.LogError(ex, "Error updating async task status for ID: {TaskId}", jobId);
+		}
+	}
 }

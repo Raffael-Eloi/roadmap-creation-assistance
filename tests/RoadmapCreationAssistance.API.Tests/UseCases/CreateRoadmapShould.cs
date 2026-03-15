@@ -123,36 +123,26 @@ public class CreateRoadmapShould
 	}
 
 	[Test]
-	public async Task Save_Task_Before_Enqueuing_Message()
+	public async Task Update_Status_To_Error_On_Queue_Send_Failure()
 	{
 		#region Arrange
 
-		int databaseSaveCallCount = 0;
-		int queueSendCallCount = 0;
-
-		databaseRepositoryMock
-			.Setup(repo => repo.Save(It.IsAny<AsyncTaskRequest>()))
-			.Callback(() => databaseSaveCallCount++)
-			.Returns(Task.CompletedTask);
-
 		queueServiceMock
 			.Setup(queue => queue.SendAsync(It.IsAny<QueueMessage>()))
-			.Callback(() => queueSendCallCount++)
-			.Returns(Task.CompletedTask);
+			.ThrowsAsync(new Exception("Queue service failed"));
 
 		#endregion
 
-		#region Act
+		#region Act & Assert
 
-		await createRoadmap.Execute(request);
+		Assert.ThrowsAsync<Exception>(() => createRoadmap.Execute(request));
 
-		#endregion
-
-		#region Assert
-
-		databaseSaveCallCount.Should().Be(1);
-		queueSendCallCount.Should().Be(1);
-		databaseSaveCallCount.Should().BeLessThanOrEqualTo(queueSendCallCount);
+		databaseRepositoryMock
+			.Verify(repo => repo.UpdateStatus(
+				It.IsAny<string>(),
+				AsyncTaskStatus.Error,
+				It.Is<List<string>>(errors => errors != null && errors.Count > 0)),
+			Times.Once);
 
 		#endregion
 	}
