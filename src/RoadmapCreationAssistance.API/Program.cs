@@ -99,6 +99,7 @@ builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
 builder.Services.AddScoped<IPromptProvider, PromptProvider>();
 builder.Services.AddScoped<IGithubRepository, GithubRepository>();
 builder.Services.AddScoped<IGitHubGraphQLClient, GitHubGraphQLClient>();
+builder.Services.AddScoped<CreateRoadmap>();
 
 builder.Services.AddHealthChecks()
     .AddUrlGroup(new Uri(builder.Configuration["GitHubApi:HealthCheckUrl"]!), "github")
