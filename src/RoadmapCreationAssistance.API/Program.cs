@@ -1,14 +1,5 @@
-using RoadmapCreationAssistance.API.Contracts.Repositories;
-using RoadmapCreationAssistance.API.Contracts.Services;
-using RoadmapCreationAssistance.API.Contracts.UseCases;
+using RoadmapCreationAssistance.API.Extensions;
 using RoadmapCreationAssistance.API.Middlewares;
-using RoadmapCreationAssistance.API.Policies;
-using RoadmapCreationAssistance.API.Repositories;
-using RoadmapCreationAssistance.API.Repositories.Github;
-using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
-using RoadmapCreationAssistance.API.Repositories.OpenAI;
-using RoadmapCreationAssistance.API.Services;
-using RoadmapCreationAssistance.API.UseCases;
 using Serilog;
 using Serilog.Sinks.Datadog.Logs;
 
@@ -53,55 +44,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<HttpPolicies>();
-
-builder.Services.AddHttpClient(OpenAIRepository.HttpClientName, client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["OpenAIApi:BaseUrl"]!);
-    client.Timeout = TimeSpan.FromSeconds(240);
-})
-.AddPolicyHandler((sp, _) =>
-{
-    HttpPolicies policies = sp.GetRequiredService<HttpPolicies>();
-    return policies.GetOpenAIRetryPolicy();
-});
-
-builder.Services.AddHttpClient(GithubRepository.HttpClientName, client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
-})
-.AddPolicyHandler((sp, _) =>
-{
-    HttpPolicies policies = sp.GetRequiredService<HttpPolicies>();
-    return policies.GetGitHubRetryPolicy();
-});
-
-builder.Services.AddHttpClient(GitHubGraphQLClient.HttpClientName, client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["GitHubApi:BaseUrl"]!);
-})
-.AddPolicyHandler((sp, _) =>
-{
-    HttpPolicies policies = sp.GetRequiredService<HttpPolicies>();
-    return policies.GetGitHubRetryPolicy();
-});
-
-builder.Services.AddScoped<IQueueService>(sp =>
-{
-    string connectionString = builder.Configuration["AzureStorage:ConnectionString"]!;
-    ILogger<QueueServices> logger = sp.GetRequiredService<ILogger<QueueServices>>();
-    return new QueueServices(logger, connectionString);
-});
-
-builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
-builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
-builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
-builder.Services.AddScoped<IOpenAIRepository, OpenAIRepository>();
-builder.Services.AddScoped<IRoadmapCreator, RoadmapCreator>();
-builder.Services.AddScoped<IPromptProvider, PromptProvider>();
-builder.Services.AddScoped<IGithubRepository, GithubRepository>();
-builder.Services.AddScoped<IGitHubGraphQLClient, GitHubGraphQLClient>();
-builder.Services.AddScoped<CreateRoadmap>();
+builder.Services.AddRoadmapServices(builder.Configuration);
 
 builder.Services.AddHealthChecks()
     .AddUrlGroup(new Uri(builder.Configuration["GitHubApi:HealthCheckUrl"]!), "github")

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Models;
 using RoadmapCreationAssistance.API.UseCases;
 
@@ -6,7 +7,9 @@ namespace RoadmapCreationAssistance.API.Controllers;
 
 [Route("api/roadmap/async")]
 [ApiController]
-public sealed class AsyncRoadMapGeneratorController(CreateRoadmap createRoadmapUseCase, ILogger<AsyncRoadMapGeneratorController> logger) : ControllerBase
+public sealed class AsyncRoadMapGeneratorController(
+	ICreateRoadmap createRoadmapUseCase,
+	ILogger<AsyncRoadMapGeneratorController> logger) : ControllerBase
 {
     [HttpPost]
     [ProducesResponseType(typeof(CreateRoadmapResponse), StatusCodes.Status202Accepted)]
