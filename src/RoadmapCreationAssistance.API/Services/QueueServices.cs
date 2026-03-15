@@ -9,7 +9,12 @@ public class QueueServices(ILogger<QueueServices> _logger, string _connectionStr
 {
 	public async Task SendAsync(Models.QueueMessage message)
 	{
-		QueueClient queue = new(_connectionString, message.QueueName);
+		QueueClientOptions options = new QueueClientOptions
+		{
+			MessageEncoding = QueueMessageEncoding.Base64
+		};
+
+		QueueClient queue = new(_connectionString, message.QueueName, options);
 
 		if (await queue.CreateIfNotExistsAsync() != null)
 		{
@@ -21,7 +26,12 @@ public class QueueServices(ILogger<QueueServices> _logger, string _connectionStr
 
 	public async Task<string?> RetrieveNextAsync(string queueName)
 	{
-		QueueClient queue = new(_connectionString, queueName);
+		QueueClientOptions options = new QueueClientOptions
+		{
+			MessageEncoding = QueueMessageEncoding.Base64
+		};
+
+		QueueClient queue = new(_connectionString, queueName, options);
 
 		if (!await queue.ExistsAsync())
 		{
