@@ -3,6 +3,7 @@ using RoadmapCreationAssistance.API.Contracts.Services;
 using RoadmapCreationAssistance.API.Contracts.UseCases;
 using RoadmapCreationAssistance.API.Middlewares;
 using RoadmapCreationAssistance.API.Policies;
+using RoadmapCreationAssistance.API.Repositories;
 using RoadmapCreationAssistance.API.Repositories.Github;
 using RoadmapCreationAssistance.API.Repositories.Github.GraphQL;
 using RoadmapCreationAssistance.API.Repositories.OpenAI;
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IQueueService>(sp =>
     return new QueueServices(logger, connectionString);
 });
 
+builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
 builder.Services.AddScoped<IMilestonesAIGenerator, MilestonesAIGenerator>();
 builder.Services.AddScoped<IReadmeAIGenerator, ReadmeAIGenerator>();
 builder.Services.AddScoped<IOpenAIRepository, OpenAIRepository>();
